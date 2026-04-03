@@ -1,1047 +1,485 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Marriage of Anansewa — OHemaa's Story Quiz</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ohemaa's Anansewa Quiz</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --gold: #c9920a;
-    --gold-light: #faeeda;
-    --gold-mid: #ef9f27;
-    --purple: #534AB7;
-    --purple-light: #EEEDFE;
-    --teal: #0F6E56;
-    --teal-light: #E1F5EE;
-    --coral: #D85A30;
-    --coral-light: #FAECE7;
-    --green: #3B6D11;
-    --green-light: #EAF3DE;
-    --bg: #1a1208;
-    --surface: #241a0a;
-    --surface2: #2e2210;
-    --text: #f5e8c8;
-    --text2: #c8b080;
-    --border: rgba(201,146,10,0.25);
-  }
-  body {
-    font-family: Georgia, 'Times New Roman', serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated web background */
-  #web-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    opacity: 0.07; pointer-events: none; z-index: 0;
-  }
-
-  .container {
-    position: relative; z-index: 1;
-    max-width: 780px; margin: 0 auto; padding: 20px 16px 60px;
-  }
-
-  /* HEADER */
-  .header {
-    text-align: center; padding: 32px 0 24px;
-  }
-  .spider-icon {
-    font-size: 52px; display: block; margin-bottom: 8px;
-    animation: sway 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 12px rgba(201,146,10,0.6));
-  }
-  @keyframes sway {
-    0%,100% { transform: rotate(-8deg); }
-    50% { transform: rotate(8deg); }
-  }
-  .header h1 {
-    font-size: clamp(22px, 5vw, 34px);
-    color: var(--gold-mid);
-    text-shadow: 0 0 20px rgba(239,159,39,0.4);
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-  .header p {
-    color: var(--text2); font-size: 14px; font-style: italic;
-  }
-
-  /* SECTION TITLE BANNER */
-  .section-banner {
-    background: linear-gradient(135deg, var(--surface2), #3a2a10);
-    border: 1px solid var(--gold);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    text-align: center;
-    position: relative; overflow: hidden;
-  }
-  .section-banner::before {
-    content: '';
-    position: absolute; top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(201,146,10,0.08), transparent);
-    animation: shimmer 2.5s ease-in-out infinite;
-  }
-  @keyframes shimmer { to { left: 100%; } }
-  .section-num {
-    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--gold-mid); margin-bottom: 4px;
-  }
-  .section-title {
-    font-size: 20px; color: var(--text); margin-bottom: 4px;
-  }
-  .section-desc {
-    font-size: 13px; color: var(--text2); font-style: italic;
-  }
-
-  /* PROGRESS */
-  .progress-wrap {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-  }
-  .progress-bar-bg {
-    flex: 1; height: 6px; background: var(--surface2);
-    border-radius: 3px; overflow: hidden;
-  }
-  .progress-bar-fill {
-    height: 100%; background: var(--gold-mid);
-    border-radius: 3px; transition: width 0.4s ease;
-  }
-  .progress-label { font-size: 13px; color: var(--text2); white-space: nowrap; }
-
-  /* TIMER */
-  .timer-wrap {
-    display: flex; justify-content: center; margin-bottom: 16px;
-  }
-  .timer-ring {
-    position: relative; width: 68px; height: 68px;
-  }
-  .timer-ring svg { transform: rotate(-90deg); }
-  .timer-ring circle.bg { fill: none; stroke: var(--surface2); stroke-width: 5; }
-  .timer-ring circle.fill {
-    fill: none; stroke: var(--gold-mid); stroke-width: 5;
-    stroke-linecap: round;
-    stroke-dasharray: 170;
-    transition: stroke-dashoffset 1s linear, stroke 0.3s;
-  }
-  .timer-num {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 22px; font-weight: bold; color: var(--gold-mid);
-    transition: color 0.3s;
-  }
-
-  /* QUESTION CARD */
-  .question-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px 22px;
-    margin-bottom: 16px;
-    position: relative; overflow: hidden;
-  }
-  .question-card::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    opacity: 0.3;
-  }
-  .q-number {
-    font-size: 12px; letter-spacing: 1px; color: var(--gold-mid);
-    text-transform: uppercase; margin-bottom: 10px;
-  }
-  .q-text {
-    font-size: clamp(16px, 3vw, 19px);
-    line-height: 1.6; color: var(--text);
-  }
-
-  /* OPTIONS */
-  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .opt-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    color: var(--text);
-    font-family: Georgia, serif;
-    font-size: 15px;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex; align-items: flex-start; gap: 10px;
-    line-height: 1.4;
-  }
-  .opt-btn:hover:not(:disabled) {
-    border-color: var(--gold);
-    background: #38290e;
-    transform: translateX(3px);
-  }
-  .opt-btn .opt-letter {
-    min-width: 26px; height: 26px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: bold; color: var(--gold-mid);
-    flex-shrink: 0; margin-top: 1px;
-  }
-  .opt-btn.correct {
-    background: #0d2e1a !important;
-    border-color: #3B6D11 !important;
-    color: #97C459;
-  }
-  .opt-btn.correct .opt-letter { background: #3B6D11; border-color: #3B6D11; color: #fff; }
-  .opt-btn.wrong {
-    background: #2e0d0d !important;
-    border-color: #993C1D !important;
-    color: #F0997B;
-  }
-  .opt-btn.wrong .opt-letter { background: #993C1D; border-color: #993C1D; color: #fff; }
-  .opt-btn.dim { opacity: 0.45; }
-  .opt-btn:disabled { cursor: default; transform: none; }
-
-  /* FEEDBACK */
-  .feedback-box {
-    border-radius: 12px; padding: 16px 18px;
-    margin-bottom: 16px; display: none;
-    border-left: 4px solid;
-    animation: fadeSlide 0.3s ease;
-  }
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(-6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .feedback-box.correct-fb {
-    background: #0a2318; border-color: #3B6D11;
-    display: block;
-  }
-  .feedback-box.wrong-fb {
-    background: #2a0e0e; border-color: #993C1D;
-    display: block;
-  }
-  .fb-verdict {
-    font-size: 15px; font-weight: bold; margin-bottom: 6px;
-  }
-  .correct-fb .fb-verdict { color: #97C459; }
-  .wrong-fb .fb-verdict { color: #F0997B; }
-  .fb-explain { font-size: 14px; color: var(--text2); line-height: 1.6; }
-  .fb-story { font-size: 13px; color: var(--text2); margin-top: 8px; font-style: italic; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.07); }
-
-  /* NEXT BUTTON */
-  .next-btn {
-    width: 100%;
-    background: var(--gold);
-    color: #1a0f02;
-    border: none;
-    border-radius: 10px;
-    padding: 15px 24px;
-    font-family: Georgia, serif;
-    font-size: 16px; font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: none;
-  }
-  .next-btn:hover { background: var(--gold-mid); transform: scale(1.01); }
-  .next-btn.visible { display: block; }
-
-  /* SCORE CARD per 10 */
-  .section-score {
-    background: var(--surface);
-    border: 1px solid var(--gold);
-    border-radius: 16px;
-    padding: 28px 24px;
-    text-align: center;
-    display: none;
-  }
-  .section-score.visible { display: block; }
-  .ss-spider { font-size: 48px; margin-bottom: 12px; }
-  .ss-title { font-size: 22px; color: var(--gold-mid); margin-bottom: 8px; }
-  .ss-sub { font-size: 14px; color: var(--text2); font-style: italic; margin-bottom: 20px; line-height: 1.6; }
-  .ss-score-big {
-    font-size: 56px; color: var(--gold-mid);
-    margin-bottom: 4px; line-height: 1;
-  }
-  .ss-score-label { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
-  .stars { font-size: 32px; margin-bottom: 20px; letter-spacing: 4px; }
-  .continue-btn {
-    background: var(--gold);
-    color: #1a0f02;
-    border: none; border-radius: 10px;
-    padding: 14px 36px;
-    font-family: Georgia, serif; font-size: 16px; font-weight: bold;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .continue-btn:hover { background: var(--gold-mid); }
-
-  /* FINAL SCORE */
-  .final-score {
-    background: var(--surface);
-    border: 2px solid var(--gold);
-    border-radius: 20px;
-    padding: 36px 24px;
-    text-align: center;
-    display: none;
-  }
-  .final-score.visible { display: block; }
-  .fs-title { font-size: 28px; color: var(--gold-mid); margin-bottom: 6px; }
-  .fs-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
-  .fs-big { font-size: 72px; color: var(--gold-mid); line-height: 1; margin-bottom: 4px; }
-  .fs-denom { font-size: 18px; color: var(--text2); margin-bottom: 20px; }
-  .fs-msg { font-size: 16px; color: var(--text); line-height: 1.7; margin-bottom: 28px; font-style: italic; }
-  .fs-stars { font-size: 40px; margin-bottom: 20px; }
-  .restart-btn {
-    background: var(--gold); color: #1a0f02;
-    border: none; border-radius: 10px;
-    padding: 14px 36px;
-    font-family: Georgia, serif; font-size: 16px; font-weight: bold;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .restart-btn:hover { background: var(--gold-mid); }
-
-  /* SCORE TRACK */
-  .score-track {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 16px;
-    background: var(--surface2);
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-size: 14px;
-  }
-  .score-track .s-label { color: var(--text2); }
-  .score-track .s-val { color: var(--gold-mid); font-weight: bold; font-size: 16px; }
-
-  /* WELCOME SCREEN */
-  #welcome {
-    text-align: center; padding: 20px 0;
-  }
-  .welcome-card {
-    background: var(--surface);
-    border: 1px solid var(--gold);
-    border-radius: 20px;
-    padding: 36px 28px;
-    margin-bottom: 24px;
-  }
-  .welcome-card h2 { font-size: 24px; color: var(--gold-mid); margin-bottom: 12px; }
-  .welcome-card p { font-size: 15px; color: var(--text2); line-height: 1.8; margin-bottom: 10px; }
-  .welcome-card .features {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px; margin: 20px 0;
-  }
-  .feature-pill {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px;
-    font-size: 13px; color: var(--text2);
-    text-align: left;
-  }
-  .feature-pill span { color: var(--gold-mid); font-size: 16px; margin-right: 6px; }
-  .start-btn {
-    background: var(--gold); color: #1a0f02;
-    border: none; border-radius: 12px;
-    padding: 16px 48px;
-    font-family: Georgia, serif; font-size: 18px; font-weight: bold;
-    cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 4px 20px rgba(201,146,10,0.4);
-  }
-  .start-btn:hover { background: var(--gold-mid); transform: scale(1.03); }
-
-  /* Confetti */
-  .confetti-piece {
-    position: fixed; pointer-events: none;
-    width: 8px; height: 8px; z-index: 9999;
-    animation: confettiFall linear forwards;
-    border-radius: 1px;
-  }
-  @keyframes confettiFall {
-    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-  .time-warn { animation: pulse 0.5s ease-in-out infinite; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d1117 0%, #1a0a2e 35%, #2d1b69 65%, #0d4a2e 100%);
+  background-attachment: fixed;
+  color: #fff;
+}
+.particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+.particle { position: absolute; border-radius: 50%; animation: floatUp linear infinite; }
+@keyframes floatUp {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+}
+.web-bg {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; opacity: 0.03;
+  background-image: repeating-linear-gradient(0deg, #fff 0, #fff 1px, transparent 0, transparent 50%),
+    repeating-linear-gradient(90deg, #fff 0, #fff 1px, transparent 0, transparent 50%);
+  background-size: 40px 40px;
+}
+.app { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 26px;
+  padding: 40px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+h1 { font-size: 2.1rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; }
+.sub { color: rgba(255,255,255,0.55); font-size: 0.93rem; margin-bottom: 28px; line-height: 1.6; }
+input[type=text] {
+  width: 100%;
+  background: rgba(255,255,255,0.09);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 15px 18px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
+}
+input[type=text]::placeholder { color: rgba(255,255,255,0.35); }
+input[type=text]:focus { border-color: rgba(245,166,35,0.7); box-shadow: 0 0 0 3px rgba(245,166,35,0.1); }
+.btn {
+  display: block; width: 100%;
+  padding: 16px; border-radius: 14px;
+  border: none; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+}
+.btn-primary { background: linear-gradient(135deg, #f5a623, #e8612a); color: #1a0a00; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(245,166,35,0.4); }
+.btn-primary:active { transform: translateY(0); }
+.set-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+.set-card {
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.13);
+  border-radius: 18px; padding: 20px 22px;
+  cursor: pointer; transition: all 0.25s;
+  display: flex; align-items: center; gap: 16px;
+}
+.set-card:hover { transform: translateX(5px); }
+.set-card .icon { font-size: 2rem; flex-shrink: 0; }
+.set-card h3 { font-size: 0.98rem; font-weight: 700; margin-bottom: 4px; }
+.set-card p { font-size: 0.8rem; color: rgba(255,255,255,0.48); line-height: 1.5; }
+.set-card .badge {
+  margin-left: auto; flex-shrink: 0;
+  font-size: 0.72rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 99px;
+}
+.progress-wrap { margin-bottom: 18px; }
+.progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.84rem; color: rgba(255,255,255,0.58); }
+.progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
+.timer-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.timer-circle {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 800; border: 3px solid;
+  transition: all 0.3s; flex-shrink: 0;
+}
+.tok { border-color: #34d399; color: #34d399; }
+.twarn { border-color: #fbbf24; color: #fbbf24; }
+.tdanger { border-color: #f87171; color: #f87171; animation: tpulse 0.5s ease infinite alternate; }
+@keyframes tpulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+.q-text { font-size: 1.04rem; font-weight: 600; line-height: 1.65; margin-bottom: 20px; color: rgba(255,255,255,0.95); }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  display: flex; align-items: flex-start; gap: 13px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.11);
+  border-radius: 13px; padding: 13px 15px;
+  cursor: pointer; transition: all 0.17s;
+  font-size: 0.93rem; line-height: 1.5;
+}
+.option:hover:not(.locked) { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.4); }
+.option.sel { background: rgba(245,166,35,0.16); border-color: rgba(245,166,35,0.6); }
+.option.cor { background: rgba(52,211,153,0.15); border-color: #34d399; }
+.option.wrg { background: rgba(248,113,113,0.15); border-color: #f87171; }
+.opt-letter {
+  min-width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.78rem; flex-shrink: 0; color: rgba(255,255,255,0.65);
+}
+.option.cor .opt-letter { background: #34d399; color: #022c22; }
+.option.wrg .opt-letter { background: #f87171; color: #2c0000; }
+.option.sel:not(.cor):not(.wrg) .opt-letter { background: rgba(245,166,35,0.55); color: #1a0a00; }
+.fb {
+  margin-top: 14px; padding: 14px 16px;
+  border-radius: 14px; font-size: 0.87rem; line-height: 1.65;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fb-ok { background: rgba(52,211,153,0.11); border: 1px solid rgba(52,211,153,0.32); color: #6ee7b7; }
+.fb-no { background: rgba(248,113,113,0.11); border: 1px solid rgba(248,113,113,0.32); color: #fca5a5; }
+.next-btn {
+  margin-top: 18px; padding: 14px; border-radius: 14px; border: none;
+  color: #1a0a00; font-size: 1rem; font-weight: 700;
+  cursor: pointer; width: 100%; transition: all 0.2s;
+}
+.next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,166,35,0.35); }
+.score-big {
+  font-size: 5rem; font-weight: 900; text-align: center; margin: 12px 0 6px;
+  background: linear-gradient(135deg, #f5a623, #34d399);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.score-lbl { text-align: center; color: rgba(255,255,255,0.52); margin-bottom: 20px; font-size: 0.94rem; }
+.grade-badge {
+  padding: 7px 22px; border-radius: 99px;
+  font-weight: 800; font-size: 1.05rem;
+  width: fit-content; margin: 0 auto 22px; display: block; text-align: center;
+}
+.stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+.stat { background: rgba(255,255,255,0.07); border-radius: 14px; padding: 14px; text-align: center; }
+.stat .n { font-size: 1.7rem; font-weight: 800; }
+.stat .l { font-size: 0.74rem; color: rgba(255,255,255,0.48); margin-top: 3px; }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.btn-sec {
+  padding: 13px; border-radius: 13px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: #fff; font-size: 0.92rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-sec:hover { background: rgba(255,255,255,0.11); }
+.stag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 99px;
+  margin-bottom: 10px; letter-spacing: 0.3px;
+}
+.streak-txt { font-size: 0.82rem; }
+.advice { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 16px; margin-bottom: 20px; font-size: 0.86rem; color: rgba(255,255,255,0.62); line-height: 1.7; }
+@media (max-width: 520px) {
+  .card { padding: 22px 16px; }
+  h1 { font-size: 1.6rem; }
+  .stat-row { grid-template-columns: 1fr 1fr; }
+  .btn-row { grid-template-columns: 1fr; }
+  .score-big { font-size: 3.8rem; }
+}
 </style>
 </head>
 <body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const GSURL = "https://script.google.com/macros/s/AKfycbzQ49ebOvpIuttMBXh7gkCRU857mK6T0Hr3v4yiEisPzHjwHdaPFyD744kWGVu81KymqA/exec";
 
-<canvas id="web-canvas"></canvas>
-
-<div class="container">
-  <div class="header">
-    <span class="spider-icon">🕷️</span>
-    <h1>The Marriage of Anansewa</h1>
-    <p>OHemaa's interactive story quest — 70 questions, one brilliant play</p>
-  </div>
-
-  <!-- WELCOME -->
-  <div id="welcome">
-    <div class="welcome-card">
-      <h2>Welcome, OHemaa! 🌟</h2>
-      <p>Efua T. Sutherland's play is clever, funny, and deeply Ghanaian — and you're about to experience every twist through this quiz. Answer 70 questions spread across 7 acts, each revealing more of the story as you go.</p>
-      <p>By the time you finish all 70, you'll know this play like you read it twice.</p>
-      <div class="features">
-        <div class="feature-pill"><span>⏱</span>30 seconds per question</div>
-        <div class="feature-pill"><span>📖</span>Story explanations after each answer</div>
-        <div class="feature-pill"><span>🎯</span>7 sections × 10 questions</div>
-        <div class="feature-pill"><span>⭐</span>Score and stars after each section</div>
-      </div>
-    </div>
-    <button class="start-btn" onclick="startQuiz()">Begin the Story ➜</button>
-  </div>
-
-  <!-- QUIZ AREA -->
-  <div id="quiz-area" style="display:none;">
-    <div class="score-track">
-      <span class="s-label">Total score</span>
-      <span class="s-val" id="total-score-display">0 / 0</span>
-    </div>
-    <div class="section-banner">
-      <div class="section-num" id="sect-num">Section 1 of 7</div>
-      <div class="section-title" id="sect-title">Loading...</div>
-      <div class="section-desc" id="sect-desc">Loading...</div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
-      <div class="progress-label" id="prog-label">Q1 of 70</div>
-    </div>
-    <div class="timer-wrap">
-      <div class="timer-ring">
-        <svg viewBox="0 0 68 68" width="68" height="68">
-          <circle class="bg" cx="34" cy="34" r="27"/>
-          <circle class="fill" id="timer-circle" cx="34" cy="34" r="27" stroke-dashoffset="0"/>
-        </svg>
-        <div class="timer-num" id="timer-num">30</div>
-      </div>
-    </div>
-    <div class="question-card">
-      <div class="q-number" id="q-num-label">Question 1</div>
-      <div class="q-text" id="q-text">Loading question...</div>
-    </div>
-    <div class="options" id="options-container"></div>
-    <div class="feedback-box" id="feedback-box">
-      <div class="fb-verdict" id="fb-verdict"></div>
-      <div class="fb-explain" id="fb-explain"></div>
-      <div class="fb-story" id="fb-story"></div>
-    </div>
-    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
-  </div>
-
-  <!-- SECTION SCORE -->
-  <div class="section-score" id="section-score">
-    <div class="ss-spider" id="ss-icon">🕷️</div>
-    <div class="ss-title" id="ss-title">Section Complete!</div>
-    <div class="ss-sub" id="ss-sub">Loading...</div>
-    <div class="stars" id="ss-stars">⭐⭐⭐</div>
-    <div class="ss-score-big" id="ss-score">0</div>
-    <div class="ss-score-label">out of 10</div>
-    <button class="continue-btn" id="continue-btn" onclick="continueQuiz()">Continue the Story →</button>
-  </div>
-
-  <!-- FINAL SCORE -->
-  <div class="final-score" id="final-score">
-    <div class="fs-stars" id="fs-stars">🌟🌟🌟</div>
-    <div class="fs-title">You've read the play!</div>
-    <div class="fs-sub">The Marriage of Anansewa — fully experienced</div>
-    <div class="fs-big" id="fs-score">0</div>
-    <div class="fs-denom">out of 70</div>
-    <div class="fs-msg" id="fs-msg">Loading...</div>
-    <button class="restart-btn" onclick="restartQuiz()">Play Again 🕷️</button>
-  </div>
-</div>
-
-<script>
-const QUESTIONS = [
-  // SECTION 1: The Struggle Begins (Q1-10) - Poverty, plan forming, letters
-  {s:0,q:"What storytelling tradition forms the foundation of The Marriage of Anansewa?",
-   opts:["Abibigoro","Anansesem","Mboguro","Akan Drama"],a:1,
-   explain:"Anansesem literally means 'Ananse stories' in Akan — it's both the body of stories and the storytelling performance itself. Sutherland developed this into Anansegoro, a full theatrical system.",
-   story:"The very first thing the foreword tells us is that this play grows from Ghana's richest oral tradition. Ananse the spider-man has been telling human stories for centuries."},
-  {s:0,q:"How does the playwright describe Ananse's character in the foreword?",
-   opts:["A heroic warrior king","A supernatural deity","A clever but flawed Everyman","A wise elder of the community"],a:2,
-   explain:"Ananse represents all of us — 'artistically exaggerated and distorted' to help society examine itself. He's cunning AND foolish, ambitious AND greedy, loveable AND irritating.",
-   story:"Think of Ananse as a mirror held up to society. His failures make us laugh at ourselves."},
-  {s:0,q:"What is the typical social reaction to Ananse according to the foreword?",
-   opts:["Fear and respect","Admiration","Laughter","Anger and disgust"],a:2,
-   explain:"Laughter is the main response. The expression 'Ananse's wealth!' is a sarcastic phrase for victories that won't last — because Ananse always over-reaches and ends up poor again.",
-   story:"This dark irony hangs over the whole play. Every time Ananse succeeds, we should be laughing nervously."},
-  {s:0,q:"What is Mboguo in the play?",
-   opts:["A type of Akan mask","Musical interludes and performances","A praise title for chiefs","A ceremonial weapon"],a:1,
-   explain:"Mboguo are musical performances that interrupt the narration — songs, dances, mimes. They can reflect mood, quicken pace, or even show shifts in time and place.",
-   story:"Every time you see a Mboguo, the play is breathing. These musical breaks are as important as the dialogue."},
-  {s:0,q:"As Act One opens, what is happening when Ananse rushes in?",
-   opts:["He is chased by debt collectors","He is escaping the rain","He is late to meet a chief","He is celebrating news"],a:1,
-   explain:"Ananse rushes in wearing a shabby raincoat, shaking off rain — and the Players are already singing 'Oh life is a struggle, Oh life is a pain.' Rain = life beating him down.",
-   story:"This brilliant opening image says everything. Rain + shabby coat + struggle song = a man at the very bottom, about to scheme his way up."},
-  {s:0,q:"What does Ananse ask Anansewa to bring him as the play begins?",
-   opts:["Money from the mattress","His old letters","Her typewriter","A list of chiefs"],a:2,
-   explain:"He calls 'Where is that typewriter of yours? Bring it here.' The typewriter — bought at great cost — is about to become his weapon of deception.",
-   story:"The typewriter is the play's first symbolic object. Education, bought expensively, is immediately repurposed for a scheme."},
-  {s:0,q:"What financial problem does Ananse use to persuade Anansewa to help him?",
-   opts:["Their roof is leaking","Her school fees are unpaid and she's been home two weeks","He owes money to a chief","The typewriter instalments are overdue"],a:1,
-   explain:"He methodically lists their poverty: unpaid fees, lumpy mattress, leaking roof, no fridge, no car, missing church collections. Anansewa has been home two weeks because fees are owed.",
-   story:"Ananse doesn't just ask — he builds an entire case. He is a genius at emotional manipulation through facts."},
-  {s:0,q:"What unusual thing does Ananse use as a greeting in the letters he dictates?",
-   opts:["Simple names like 'Dear Sir'","Short friendly greetings","Elaborate and exaggerated praise-names","Traditional proverbs only"],a:2,
-   explain:"He opens with flowery praise-names — 'O Mighty-Tree-Of-Ancient-Origin, Rooted in the shrine of deity!' When Anansewa objects, he says simply: 'Chiefs adore their appellations.'",
-   story:"Ananse knows his targets perfectly. Flattery is his fishing hook, and he baits it perfectly for each chief."},
-  {s:0,q:"How many chiefs does Ananse write letters to?",
-   opts:["Two","Three","Four","Five"],a:2,
-   explain:"Four chiefs: Chief Sapa of Sapaase, Togbe Klu IV of Akate, a third chief whose name is whispered secretly, and Chief-Who-Is-Chief. Four directions — North, South, East, West.",
-   story:"This is the number that will haunt Ananse. Four powerful men, one daughter. The math of disaster."},
-  {s:0,q:"What is Anansewa's very first reaction when she learns the letters were proposing her for marriage?",
-   opts:["Excited and delighted","Indifferent and calm","Angry and refusing completely","Confused then curious"],a:2,
-   explain:"She explodes: 'My father is selling me! I will not let you sell me like some parcel to a customer. Not ever!' She even sings her protest with the Players joining in.",
-   story:"Her song of resistance — 'Not ever! Not ever!' — is one of the play's great moments. She has dignity and fire."},
-
-  // SECTION 2: The Plan Takes Shape (Q11-20) - Chiefs respond, money arrives
-  {s:1,q:"What does Ananse reveal that finally softens Anansewa's resistance to the marriage plan?",
-   opts:["He promises to give her the money","He reveals one chief is young and very handsome","He threatens to stop paying her fees","He says the plan is already done"],a:1,
-   explain:"With cunning timing, Ananse describes Chief-Who-Is-Chief as 'finely built, glowing black, large-eyed, handsome as anything, courageous and famous.' Anansewa goes from 'Never!' to 'Chief-Who-Is-Chief?!' instantly.",
-   story:"This is Ananse's masterstroke. He doesn't argue — he just drops the perfect bait. Her resistance collapses in seconds."},
-  {s:1,q:"How does Ananse claim Chief-Who-Is-Chief has already proved his interest?",
-   opts:["He visited in person","He sent a messenger with a gift of money","He sent flowers to Anansewa","He wrote a letter himself"],a:1,
-   explain:"Ananse reveals that the money in his pocket — Anansewa's school fees — came from Chief-Who-Is-Chief via a messenger. 'That thing is the first solid proof he is not just showing interest with his mouth.'",
-   story:"The fees in her hand are proof of real interest. Ananse uses her own gratitude as leverage. Brilliant and manipulative."},
-  {s:1,q:"In the Akwasi and Akosua interlude, what does Akosua demand before she will be considered Akwasi's wife?",
-   opts:["A ring and a church wedding","Gifts of cloth and jewellery","The customary head-drink presented to her family","A declaration of love in public"],a:2,
-   explain:"Akosua makes it clear: 'They know I'm not your wife until after you have come to their home and placed the customary head-drink on their table.' No head-drink = no marriage, legally.",
-   story:"This comic interlude is actually crucial. Sutherland is telling us the exact legal loophole Ananse intends to exploit."},
-  {s:1,q:"Why is the head-drink rule so important to Ananse's scheme?",
-   opts:["It means chiefs must visit in person","It means no gift giving is required","Without it, he has no legal obligation to give Anansewa to anyone","It means the marriage happens immediately"],a:2,
-   explain:"The Storyteller explains: 'It is possible for Ananse to profit from the gifts his daughter's suitors bring, and not be bound by any obligation at all.' No head-drink = no binding commitment.",
-   story:"Ananse has found the perfect legal gap. He can collect indefinitely with zero obligation. The scheme is genius — for now."},
-  {s:1,q:"Who sends the very first financial response to Ananse's letters?",
-   opts:["Chief Sapa of Sapaase","Togbe Klu IV of Akate","Chief-Who-Is-Chief","The Mines Chief"],a:1,
-   explain:"The Postman brings a letter from Akate — Togbe Klu. Ananse reads the contents with delight: 'A postal order worth... Oh! Not bad at all. Cactus, it's not bad at all!'",
-   story:"The moment the first money arrives, the abstract scheme becomes terrifyingly real. Ananse has crossed a line."},
-  {s:1,q:"What change in Ananse's lifestyle do we see at the start of Act Two?",
-   opts:["He becomes more humble and careful","He moves to a smaller house","He is dressed in brand-new cloth, drinking gin, and planning to go to church","He sends Anansewa away to school"],a:2,
-   explain:"Act Two opens with Ananse in new cloth, servants bringing gin, and him planning a shopping spree to buy new suits so he can donate publicly at church — his old dream from Act One.",
-   story:"Remember his Act One lament about missing church because he had nothing to put in the plate? Now he's going to be seen 'depositing alongside the best of the spenders.'"},
-  {s:1,q:"The Sapaase Messengers arrive carrying money in an unusual place. Where?",
-   opts:["In a carved wooden box","Tied in a knot in one woman's girdle (cloth belt)","In a leather pouch","In an envelope sealed with wax"],a:1,
-   explain:"One of the two matronly Sapaase messengers has a girdle with money tied in 'a huge knot in it' around her waist. She dramatically unties it and hands the money to Ananse.",
-   story:"Even the staging shows wealth — the elaborate girdle, the ceremonial untyring. These chiefs are serious, and Ananse is collecting from all sides."},
-  {s:1,q:"What workers arrive at Ananse's house during Act Two, showing how he spends his new wealth?",
-   opts:["Tailors and dress-makers","A Carpenter, Mason, and Painter","Gardeners and security guards","Cooks and stewards"],a:1,
-   explain:"Carpenter, Mason, Painter — Ananse commissions full renovations. Fixing the leaking roof (his Act One complaint!), new floors, total repainting. The workmen plan to stretch the job for ten weeks.",
-   story:"Every single thing Ananse complained about in Act One — the leaky roof, the poor house — is now being fixed with chiefs' money. The scheme is working perfectly."},
-  {s:1,q:"What news does Chief-Who-Is-Chief's Messenger bring that thrills Ananse in Act Two?",
-   opts:["The chief wants to visit personally","The chief will send the head-drink within two weeks","The chief has decided against the marriage","The chief is sending more money immediately"],a:1,
-   explain:"The Messenger announces that Chief-Who-Is-Chief will be 'completing the preparations for sending people to come and place on the table the head-drink for the lady, your daughter' in two weeks.",
-   story:"This should be wonderful news. But Ananse immediately calculates — two weeks means two chiefs competing. The knot is tightening."},
-  {s:1,q:"What devastating telegram arrives moments after Chief-Who-Is-Chief's messenger leaves?",
-   opts:["News of a death in the family","Togbe Klu announces he is coming to pay the head-drink","Chief Sapa cancels the engagement","All four chiefs are arriving together"],a:1,
-   explain:"Chief Sapa's telegram announces: 'messengers' arrival to conduct head-drink ceremony for Anansewa after two weeks.' Two chiefs, same deadline. Ananse sinks into his chair gasping: 'What am I going to do?'",
-   story:"This is the moment Ananse's web starts collapsing inward. He built a knot so tight he can't escape it himself."},
-
-  // SECTION 3: The Outdooring & Crisis (Q21-30)
-  {s:2,q:"What is the purpose of the outdooring ceremony Ananse arranges for Anansewa in Act Three?",
-   opts:["To celebrate her getting her secretarial certificate","To officially prepare her for marriage in a chief's palace","To introduce her to the community for the first time","To choose which chief she prefers"],a:1,
-   explain:"Ekuwa explains: 'If this grandchild of yours is going to marry a chief, it is our duty to prepare her in every way we can for the position she will be occupying in a palace.' It's a formal coming-of-age ritual.",
-   story:"The outdooring is beautiful, traditional, and poignant — because we know Ananse is only using it as part of his desperate scheme."},
-  {s:2,q:"Who is AYA in the play, and what is her attitude toward Christie?",
-   opts:["Anansewa's school friend, who admires Christie","Ananse's mother, who deeply distrusts Christie's intentions","Ananse's aunt, who thinks Christie is helpful","A neighbour who doesn't know Christie"],a:1,
-   explain:"Aya is Ananse's mother. She says of Christie: 'She is leaning her ladder on my grandchild in order to climb up to my son.' Sharp-eyed grandmother sees everything.",
-   story:"Aya is one of the play's unsung truth-tellers. While everyone is distracted by the marriage scheme, she's watching Christie's real agenda."},
-  {s:2,q:"In the outdooring ceremony, what does Aya (grandmother) place in the brass bowl as her gift?",
-   opts:["Gold coins and precious beads","A prayer for a good husband","Cash to pay for the wedding","Her favourite piece of cloth"],a:1,
-   explain:"Aya offers an outstretched empty hand — but her gift is a prayer: 'May the man who comes to take you be, above all things, a person with respect for the life of his fellow human beings.' Ananse panics and cuts her off.",
-   story:"This is one of the play's most powerful moments. Aya almost says something that would expose Ananse's scheme. He drowns her out with song."},
-  {s:2,q:"Who is Christie (Miss Christina Yamoah) and what is her role in Ananse's life?",
-   opts:["Anansewa's school principal","A fashionable woman who is clearly in love with Ananse","Ananse's long-lost sister","A government official helping with the marriage"],a:1,
-   explain:"Christie is a 'fashionable woman' who calls Ananse 'Georgie,' holds his hand, and is overheard sighing 'How long am I going to serve him before I get him?' She is clearly in love and makes herself indispensable.",
-   story:"Christie will become crucial to Ananse's final plan. Her love for him makes her a willing accomplice in what comes next."},
-  {s:2,q:"During the outdooring, why does Ananse suddenly shout and interrupt his own mother?",
-   opts:["He sees the Postman arriving with bad news","He is too emotional about Anansewa","He panics that Aya's prayer will reveal something uncomfortable about his real plan","He hears the workmen making noise"],a:2,
-   explain:"Aya begins: 'May the man who comes... be a person with respect for the life of his fellow human beings; a man who is incapable of...' — and Ananse frantically starts singing and dancing before she can finish. He can't let her say it.",
-   story:"What was Aya about to say? 'A man incapable of deception'? We never know, but Ananse's panic tells us everything."},
-  {s:2,q:"Which telegram arrives during the outdooring that sends Ananse into a second panic?",
-   opts:["From Chief-Who-Is-Chief changing the date","From Togbe Klu saying he is coming immediately for the head-drink","From Sapaase cancelling their interest","From Ananse's family about a farm fire"],a:1,
-   explain:"Togbe Klu's telegram says: 'not wanting to waste any more time I am coming to present the head-drink for her.' Ananse reads it and calls for Christie immediately.",
-   story:"Now three chiefs are converging on Ananse's house. The scheme has become a crisis requiring desperate action."},
-  {s:2,q:"Ananse asks Anansewa to practise something bizarre — what is it?",
-   opts:["Playing the piano to impress chiefs","Pretending to be dead — lying stiff and not breathing","Speaking in multiple languages","Walking like royalty in high heels"],a:1,
-   explain:"He says: 'I want you to look as though you are dead.' Anansewa laughs, then slowly understands. 'But father, it's necessary for you to die!' She refuses, then agrees when he links it to getting Chief-Who-Is-Chief.",
-   story:"The fake death scheme is pure Ananse — brilliantly simple. If she's dead, no chief can claim her, no head-drink is needed, and he keeps every gift received."},
-  {s:2,q:"How does Ananse convince Anansewa to agree to fake her death?",
-   opts:["He threatens to stop her education","He promises her a gift","He connects it to getting Chief-Who-Is-Chief as her husband — the man she loves","He tells her the other chiefs are dangerous"],a:2,
-   explain:"He says: 'Be willing to think with me... discipline yourself and do what it has become necessary to do, and see if you don't get the man you say you love.' Love conquers her resistance.",
-   story:"Anansewa's love for Chief-Who-Is-Chief is Ananse's ultimate leverage. The daughter agrees to die for the man she loves."},
-  {s:2,q:"How does Ananse get his mother Aya and aunt Ekuwa out of the house before executing his plan?",
-   opts:["He tells them Anansewa needs privacy","He sends them to buy items for the ceremony","He invents a lie about enemies burning the family cocoa farm in Nanka","He simply asks them to leave politely"],a:2,
-   explain:"Ananse fabricates a crisis: 'Enemies have set fire to our hope. Our cocoa farm.' Aya and Ekuwa immediately rage and rush away to Nanka to fight these enemies. They leave without question.",
-   story:"Ananse's tears trigger exactly the reactions he needs. He manipulates his mother's love and family pride. And they believe him instantly."},
-  {s:2,q:"The Storyteller acknowledges something important about Ananse's scheme legally. What is it?",
-   opts:["The chiefs can legally demand their money back","No law can force Ananse to return gifts or give his daughter in marriage","The scheme will definitely fail","Anansewa must choose herself"],a:1,
-   explain:"'There isn't any law to oblige Ananse to return to them any of the gifts he has received... Moreover, there isn't any law binding him to give his daughter in marriage to any of those four chiefs.'",
-   story:"The Storyteller is the audience's guide through the moral maze. He admires Ananse's scheme even while questioning it."},
-
-  // SECTION 4: The Fake Funeral (Q31-40) - Act Four begins
-  {s:3,q:"Act Four opens with two women rushing around crying. What is the source of their distress?",
-   opts:["Chief-Who-Is-Chief has died","Their children are ill","They believe Anansewa has died — they keep crying 'They called in Dispenser Hammond'","The house is on fire"],a:2,
-   explain:"'How could it happen? They called in Dispenser Hammond!' — two women run back and forth in half-dirge, half-wailing. Neighbours genuinely believe Anansewa is dead.",
-   story:"The Storyteller laughs: 'Ananse is lying, he is really, and so relax.' But the neighbourhood has been thoroughly fooled."},
-  {s:3,q:"How did Ananse perform his fake grief to convince the neighbourhood?",
-   opts:["He wore black and walked slowly","He shouted at midnight, then rolled on the ground striking his head against the wall","He sent written notices to all neighbours","He sat silently for three days"],a:1,
-   explain:"At midnight, Ananse screamed 'She has fainted! Alas! Help!' When people arrived, Anansewa lay still. Ananse then 'rolled on the ground, striking his head violently against the wall, pum, pum, pum' — until men had to restrain him.",
-   story:"This is performance at its peak. Ananse is not just a schemer — he is an actor. His grief is so convincing that strong men hold him back from 'killing himself.'"},
-  {s:3,q:"How many sets of messengers from the four chiefs come to pay their respects at the 'funeral'?",
-   opts:["One set","Two sets","Three sets","All four chiefs send messengers"],a:3,
-   explain:"All four chiefs send delegations: Mines Messengers (two men), Sapaase Messengers (two women and a man), Akate Messengers (Togbe Klu's brothers), and Chief-Who-Is-Chief's Messengers — the most elaborate group.",
-   story:"Each delegation's visit is a mini-drama. The play brilliantly shows each chief's character through how their messengers speak."},
-  {s:3,q:"What does the Mines Chief's delegation reveal about why the marriage was controversial?",
-   opts:["The chief had too many wives already","The chief's own councillors had advised against marrying Anansewa","Anansewa was too young for him","The chief was already engaged to someone else"],a:1,
-   explain:"The Mines Messenger says: 'Our royal one insisted — against their advice — that if a lady of this quality came into his hands she would give enlightened training to the many children to whom his wives have given birth.'",
-   story:"Ananse reflects: 'She would have gone there to get hated.' He feels genuine relief — this marriage would have been bad for Anansewa."},
-  {s:3,q:"What does the Sapaase delegation reveal about palace politics that makes Ananse secretly relieved?",
-   opts:["The chief has no money left","The palace has a 'nasty beast' of a woman who would have tormented Anansewa","The chief has too many children already","The palace is in a foreign country"],a:1,
-   explain:"The Sapaase women reveal: 'Had our royal one acquired this lady, a certain nasty beast who is at large in his home, would have fled.' A vicious rival wife was waiting to destroy any newcomer.",
-   story:"Ananse says: 'I would have pushed my child into disaster.' Each chief's funeral visit becomes a character revelation — and justification for the scheme."},
-  {s:3,q:"What is remarkable about Togbe Klu (Akate)'s response to Anansewa's 'death'?",
-   opts:["He is furious and demands money back","He doesn't believe she is really dead","He has become deeply religious and accepts it as God's will with great sorrow","He sends the most expensive gifts"],a:2,
-   explain:"The Akate messenger says Togbe Klu 'has become a most zealous adherent of a Spiritualist Church... when something happens he leaves it in God's hands.' He wept greatly but left it with God. He didn't even want his people to come.",
-   story:"This is the play's most touching moment. The chief Ananse 'forgot sometimes to count among those in the race' turns out to have the purest intentions of all."},
-  {s:3,q:"What did Togbe Klu plan to do with Anansewa that shows he was serious and progressive?",
-   opts:["Make her his chief wife","Have her train his children and manage business documents for giant trucks and a trawler","Build her a separate palace","Send her to study abroad"],a:1,
-   explain:"'He was looking forward to having a real helper to assist him in building up a substantial business... the documents for all these were to have been entrusted to his own wife's administration.'",
-   story:"Ananse is deeply moved: 'You should have given me that understanding, for I had no idea it was your desire to live so well with my child.' Too late — the Akate messengers have already gone."},
-  {s:3,q:"What extraordinary gift does Chief-Who-Is-Chief send for the funeral?",
-   opts:["The largest bag of money","A special ring from his finger","A glass coffin, plus cloths, a ring, drinks, and a bag of money — the full package a husband gives a wife","A house in his hometown"],a:2,
-   explain:"Chief-Who-Is-Chief sends: a wedding ring, burial cloths (dumas, silk kente, velvet, brocade), Schnapps for libation, a huge quantity of drinks — AND a glass coffin. He treats her as his wife even in 'death.'",
-   story:"The glass coffin is the play's most dramatic symbol. It's simultaneously a funeral gift and a wedding gift. His love is absolute."},
-  {s:3,q:"What do Chief-Who-Is-Chief's messengers reveal about his wedding plans?",
-   opts:["He had already moved on to another bride","He planned to marry someone else within weeks","He had called an important meeting just a week before 'her death' to plan the wedding","He was undecided about the marriage"],a:2,
-   explain:"'He has called a meeting of very important people at the palace a week from this very day to fix the day of the wedding and plan all the arrangements before sending word to the lady's father.'",
-   story:"A week away. The wedding was a week away. This is the cruelest irony — Ananse's scheme almost destroyed the one marriage Anansewa actually wanted."},
-  {s:3,q:"During the libation Ananse pours for Chief-Who-Is-Chief's Schnapps, what does he plead to the ancestors?",
-   opts:["He asks for forgiveness for his deception","He asks for wealth and protection","He pleads: if it is your desire that Chief-Who-Is-Chief should marry Anansewa, make her return to life","He asks the ancestors to choose a husband for Anansewa"],a:2,
-   explain:"He calls: 'Ancestors, I am pleading with you, if it is your desire as it is ours that Chief-Who-Is-Chief should marry Anansewa, see to it that she returns to life! Wake her!'",
-   story:"This is Ananse at his most sincere. The schemer has become a father praying desperately. His love for his daughter is real."},
-
-  // SECTION 5: The Miracle & Resolution (Q41-50)
-  {s:4,q:"After Ananse's libation prayer, what miracle appears to happen?",
-   opts:["The glass coffin starts glowing","Anansewa sits up and calls for her father","A voice from the sky speaks","Ananse faints and wakes healed"],a:1,
-   explain:"Ananse gasps: 'Oh, she is waking. Are there such wonders in the world?' Anansewa stirs, then springs out of the bed — to the shock of all the messengers still present.",
-   story:"The fake death becomes real drama. Is this miracle or theatre? Both — and Ananse seizes it with both hands."},
-  {s:4,q:"How does Ananse explain Anansewa's 'resurrection' to everyone present?",
-   opts:["He admits it was all fake and asks for forgiveness","He claims the doctors saved her","He declares it a miracle of love — Chief-Who-Is-Chief's love called her back to life","He says it was a misdiagnosis"],a:2,
-   explain:"He cries: 'Does love have such power? There is my child, awakened for me by love. How strong love is. Love has awakened my child!' He frames the whole thing as a supernatural proof of the Chief's devotion.",
-   story:"Ananse the spider spins one final web — turning a staged event into a love miracle. It's his greatest performance."},
-  {s:4,q:"What does the Storyteller confirm to the audience about the legal outcome for Ananse?",
-   opts:["Ananse must return all the gifts","Ananse faces criminal charges","Since nobody marries a corpse, the four chiefs' problem is untied — and Ananse legally keeps the gifts","The chiefs can sue Ananse"],a:2,
-   explain:"'As far as the four chiefs' problem is concerned, since nobody marries a corpse that part of the knot can be considered untied. Moreover, there isn't any law to oblige Ananse to return any of the gifts.'",
-   story:"The scheme worked — legally and practically. Ananse collected from four chiefs and ended up owing nothing. But he's kept the one chief who matters."},
-  {s:4,q:"What is Ananse's final speech to the gathered crowd about the 'miracle'?",
-   opts:["He apologises for the confusion","He invites everyone to a great celebration when Anansewa's spirit returns","He announces the marriage to Chief-Who-Is-Chief immediately","He says he wants money returned"],a:1,
-   explain:"He says: 'By the day of my birth, if our spirits which fled from us return to us, and I don't invite you all to meet here for a great celebration, may no parent call me George Kweku Ananse.'",
-   story:"Ananse promises a wedding party. He has navigated an impossible situation and — against all odds — landed exactly where he needed to be."},
-  {s:4,q:"What does Anansewa say she heard during her 'death' that gives the miracle a beautiful final touch?",
-   opts:["She heard the ancestors singing","She says she heard Chief-Who-Is-Chief calling her","She says she heard her mother's voice","She says she heard the chiefs fighting over her"],a:1,
-   explain:"'Father, I could hear Chief-Who-Is-Chief calling me.' And Ananse confirms: 'He was indeed calling you. His love has won a victory for us all.' The staged miracle is given genuine emotional truth.",
-   story:"Whether we believe the miracle or not, the love is real. And that love — built through all the deception — becomes the play's true resolution."},
-  {s:4,q:"What role does the Storyteller play throughout the play that makes him unique?",
-   opts:["He only narrates events from offstage","He is just like a stage manager","He knows everything, participates in action, interacts with audience, and shapes how we judge events","He only speaks at the beginning and end"],a:2,
-   explain:"The Storyteller is the owner of the story — he has 'a conventional right to know everything, to be personally involved in the action and to be capable of inducing his audience to believe they are there with him.'",
-   story:"He is Sutherland's most brilliant invention — guide, judge, comedian, and moral compass all in one. Without him, the play would be mere farce."},
-  {s:4,q:"How does the Storyteller feel about Ananse throughout the play?",
-   opts:["Fully condemning — he thinks Ananse is evil","Purely supportive — he thinks Ananse is a hero","Complex — amused, sympathetic to his fatherly love, but critical of his deceptive methods","Indifferent — he just reports events"],a:2,
-   explain:"He says 'I can feel a little for Ananse. I am a father myself' but also warns that the scheme is dangerous. He ends laughing at Ananse while celebrating the love story.",
-   story:"The Storyteller models how we should feel — holding both truth and affection for a deeply flawed, deeply human character."},
-  {s:4,q:"What is the significance of the phrase 'Ananse's wealth!' mentioned in the foreword?",
-   opts:["A compliment for being rich","A sarcastic expression for success that won't last","A traditional way to greet a wealthy man","A prayer for prosperity"],a:1,
-   explain:"'Ananse's wealth!' is described as 'a sarcastic expression for successes and triumphs which are not likely to last. Indeed most of Ananse's successes are doubtful and temporary.'",
-   story:"The foreword warns us from the start: don't get too comfortable with Ananse's victories. But this time — with love involved — maybe the wealth will last."},
-  {s:4,q:"What phrase ends the play, sung by the Players as everyone departs joyfully?",
-   opts:["'Ananse has won, mankind has lost!'","'Let's relate in love, that we may thrive'","'The web is spun, now we must run'","'Life is a struggle, life is a pain'"],a:1,
-   explain:"The final song: 'Let's relate in love / That we may thrive / True love is rare.' And variations: 'True giver is rare, True helper is rare, Thank you, chief so rare, Thank you, husband rare.'",
-   story:"The play that began with 'Life is a struggle, life is a pain' ends with love, celebration, and gratitude. The circle is complete."},
-  {s:4,q:"What is the Storyteller's very last action in the play?",
-   opts:["He disappears mysteriously","He breaks into laughter crying 'That's Kweku all right!' then manages the guests' departure at Ananse's request","He delivers a long moral speech","He announces future performances"],a:1,
-   explain:"He bursts laughing: 'That's Kweku all right!' Ananse tells him to stop praise-singing and manage the guests' departure. The Storyteller obeys cheerfully: 'In that case, friends, we will end this Anansegoro right here.'",
-   story:"Even at the very end, Ananse is managing events. And the Storyteller — smiling — hands the story back to the audience."},
-
-  // SECTION 6: Themes & Characters (Q51-60)
-  {s:5,q:"What major theme does Ananse's scheme most directly explore?",
-   opts:["The importance of education","The conflict between poverty and dignity in modern Ghana","Why arranged marriages fail","The power of traditional music"],a:1,
-   explain:"Ananse's desperate scheming comes entirely from poverty and his desire for dignity. His Act One speech about church collections, coffins, and Dunlopillo mattresses shows how deeply poverty wounds the spirit.",
-   story:"The play asks: what does poverty drive good people to do? Ananse is not evil — he is desperate. And desperation breeds creativity."},
-  {s:5,q:"What does Anansewa's character represent in the play?",
-   opts:["Passive obedience to her father","Traditional Ghanaian womanhood with no opinions","A modern young woman with dignity, agency, and genuine emotions","A victim who has no choice"],a:2,
-   explain:"Anansewa refuses to be 'sold like a parcel,' confronts her father, insists on her own feelings, and falls genuinely in love. But she also trusts and cooperates when love gives her a reason to.",
-   story:"She is not just a plot object — she is a person. Her journey from resistance to willing cooperation is the emotional heart of the play."},
-  {s:5,q:"What cultural institution does the play both celebrate and critique through Ananse's scheme?",
-   opts:["The church collection system","The customary marriage gift system (head-drink and suitor gifts)","The secretarial school system","The postal service"],a:1,
-   explain:"The play celebrates the beauty and wisdom of the head-drink ceremony, the outdooring ritual, and family involvement in marriage — while also showing how these customs can be exploited by someone clever enough.",
-   story:"Sutherland is not attacking Ghanaian custom. She is showing what happens when a desperate man weaponises tradition. The customs themselves are shown as beautiful."},
-  {s:5,q:"What does Aya's (grandmother's) character add to the play?",
-   opts:["Comic relief only","A voice of traditional wisdom, emotional truth, and sharp observation","She represents the educated class","She shows the failure of old customs"],a:1,
-   explain:"Aya weeps for Anansewa's mother who should be there for the outdooring. She sees through Christie. She nearly exposes Ananse. She is the play's moral anchor — even as Ananse cleverly manages her.",
-   story:"Aya's prayer for Anansewa — 'a man who is incapable of...' — is the most important unfinished sentence in the play. She is always one step closer to the truth than anyone else."},
-  {s:5,q:"What does Christie's relationship with Ananse suggest about gender dynamics in the play?",
-   opts:["Women always support men unconditionally","Christie represents women exploiting men","Christie shows a capable, modern woman whose skills and emotions are used — but whose own desires may go unfulfilled","Christie is the play's villain"],a:2,
-   explain:"Christie is brilliant, competent, and devoted. She manages the entire fake funeral with grace. But her love for Ananse — 'how long am I going to serve him before I get him?' — suggests her own desires are secondary to his schemes.",
-   story:"The taxi driver calls her 'Mrs Ananse.' She loves the sound of it. Will she ever actually become Mrs Ananse? The play leaves this beautifully open."},
-  {s:5,q:"Why does the Storyteller repeatedly say 'Anansegoro doesn't take long to grow'?",
-   opts:["He means the actors learn their lines fast","He means the play is short","He signals time jumps — events in the story move quickly, skipping weeks and months","He is explaining the plot to latecomers"],a:2,
-   explain:"He uses this phrase to bridge time: 'time having passed, let me remind you that this is the day set by one of the four chiefs for his performance of the head-drink ceremony.' It's his way of fast-forwarding.",
-   story:"Anansegoro (the play form) grows like a spider's web — quickly, organically, spreading in all directions. Time moves with the story's need, not the clock."},
-  {s:5,q:"The foreword mentions the sarcastic saying 'Exterminate Ananse, and society will be ruined.' What does this mean?",
-   opts:["Society needs Ananse to be a leader","Ananse's flaws — greed, cunning, ambition — are universal human traits that society cannot eliminate without destroying itself","Ananse is too powerful to remove","The story cannot continue without Ananse"],a:1,
-   explain:"If you remove human cunning, greed, and cleverness from society, you remove something essential about humanity itself. Ananse is a mirror — destroy the reflection and you may destroy what makes us human.",
-   story:"This is Sutherland's deepest philosophical point. Ananse is not a villain to be defeated. He is a truth to be understood."},
-  {s:5,q:"What is the significance of the spider web screen that appears several times in the play?",
-   opts:["It represents death","It is just a stage decoration","It symbolises Ananse's schemes — things he hides behind, plans he weaves, traps he sets for himself","It represents the ancestors' protection"],a:2,
-   explain:"The web screen appears when Ananse hides to think, when Anansewa is placed for the 'funeral,' when the Storyteller peeks at Ananse. It is Ananse's symbol — both his power and his trap.",
-   story:"Ananse is literally caught in his own web by Act Three. The stage design makes his metaphor physical."},
-  {s:5,q:"How does the play portray the relationship between father and daughter (Ananse and Anansewa)?",
-   opts:["Purely exploitative with no genuine love","Cold and formal throughout","Complex — there is real love underneath all the manipulation","The daughter is completely unaware of her father's feelings"],a:2,
-   explain:"Ananse's monologue before the fake funeral reveals his true heart: 'I have a deep fatherly concern for this only child of mine... I would not gamble with such a priceless possession.' He is flawed but loving.",
-   story:"The scheme and the love are inseparable. Ananse's love for Anansewa is the reason he schemes, and also the reason the scheme ultimately works."},
-  {s:5,q:"What is the significance of Anansewa's song 'My heart, my heart, stop beating' in Act Three?",
-   opts:["She is actually ill","She is practising for the fake death","It reveals her genuine terror that Ananse has destroyed her chance with Chief-Who-Is-Chief through his deceptions","She is being dramatic for attention"],a:2,
-   explain:"'The chance has turned to wind, to wind, wind, wind.' When Anansewa sings this, she genuinely believes Ananse has told Chief-Who-Is-Chief she doesn't love him. Her heartbreak is real.",
-   story:"This is Anansewa's most vulnerable moment. Her love is not staged — it's the truest thing in the play."},
-
-  // SECTION 7: The Play's World & Legacy (Q61-70)
-  {s:6,q:"What was Ananse's full dream in Act One — the list of things he hoped for from the scheme?",
-   opts:["Just school fees for Anansewa","Only to fix the leaking roof","A Dunlopillo mattress, leak-proof roof, comfortable chairs, a fridge, a car, invitation lists for state functions, fine clothes for church, a private hearse","Just to pay off the typewriter"],a:2,
-   explain:"He lists them all with comedic excess: mattress, roof, chairs, fridge, car, embassies' parties, memorial service clothes, the ability to donate five guineas publicly, and a private hearse at death.",
-   story:"The list is both funny and heartbreaking. These are not extravagant luxuries — they are the dignities of a comfortable middle-class life. Poverty has made them feel impossible."},
-  {s:6,q:"What is the Postman's recurring role, and what comic function does he serve?",
-   opts:["He is a minor character with no significance","He is Ananse's secret ally in the scheme","He appears at pivotal moments carrying each new crisis, and his growing respect for Ananse (calling him 'Sir') tracks Ananse's rise","He represents the modern postal system's failures"],a:2,
-   explain:"The Postman first treats Ananse normally, then — seeing the renovated house — salutes and calls him 'Sir.' Ananse notes this with sad irony: 'They are beginning to salute me. If only time would stand still for me.'",
-   story:"The Postman is a social barometer. As Ananse's house improves, his treatment improves. Status is measured in stuff — and Ananse knows it can't last."},
-  {s:6,q:"The play opens with 'Oh life is a struggle, Oh life is a pain.' What song ends the play?",
-   opts:["'Life is a struggle' again, repeating the opening","'Let's relate in love, that we may thrive'","'Ananse's wealth will never last'","'The world is really hard'"],a:1,
-   explain:"'Let's relate in love / That we may thrive / True love is rare.' The play moves from pain to love, from struggle to celebration. The circle of the story is complete.",
-   story:"This structural contrast — opening pain, closing love — is Sutherland's master design. The journey of the play IS the journey from despair to hope."},
-  {s:6,q:"What does Togbe Klu's response to Anansewa's 'death' reveal about him as a character?",
-   opts:["He is easily deceived and foolish","He is the greediest of the four chiefs","He is possibly the most spiritually evolved and genuinely good-hearted of all the suitors","He is the richest and most powerful"],a:2,
-   explain:"He wept deeply but left it in God's hands. He didn't even want his people to make the trip. His brothers came against his wishes just to show respect. He had the most human plans for Anansewa.",
-   story:"Of all four chiefs, Togbe Klu is the one Ananse comes to regret losing. 'You should have given me that understanding.' The right man came second."},
-  {s:6,q:"What does the Mines Chief's household politics reveal about why Ananse was RIGHT to stop that marriage?",
-   opts:["The chief was too old","The chief's palace was too far away","The chief's councillors opposed Anansewa and she would have faced hostility from existing wives","The chief had no money to support her"],a:2,
-   explain:"The Mines messengers say the chief 'insisted against their advice' — and the Sapaase messengers revealed similar politics. Both palaces had internal enemies waiting for a new wife.",
-   story:"Ananse's scheme, however dishonest, may have accidentally protected his daughter from genuinely dangerous marriages. The play invites us to wrestle with this moral complexity."},
-  {s:6,q:"What does Christie's song 'Can he see / That I love him / And toiling for him' reveal about her character?",
-   opts:["She is greedy and scheming","She is genuinely and vulnerably in love with Ananse, serving him hoping to win him","She is planning to betray Ananse","She is only pretending to love him"],a:1,
-   explain:"She sings this privately, not knowing Ananse is watching. Her vulnerability is real. Ananse then joins in and dances with her — showing he is aware and perhaps appreciative of her devotion.",
-   story:"This is one of the play's most tender moments. Christie's love is the one genuine, uncompliciated emotion in a play full of schemes and pretence."},
-  {s:6,q:"What does the outdooring ceremony (with lime, egg, gold, nyanya leaves) represent in Ghanaian culture?",
-   opts:["A coronation ceremony for future queens","A formal coming-of-age ritual that prepares a woman spiritually and culturally for marriage and adult life","A celebration of exam success","A religious conversion ceremony"],a:1,
-   explain:"Aya describes each element: lime to 'season' her to stand firm against hardship; egg to bless her soul; gold to honour her; nyanya to purge evil. It is a profound cultural blessing.",
-   story:"The ceremony's beauty stands in contrast to the scheme surrounding it. Sutherland insists on showing Ghanaian culture's depth, even as she shows its potential for exploitation."},
-  {s:6,q:"The play was published after productions by three different Ghanaian companies. What does this tell us about it?",
-   opts:["It was controversial and banned initially","It was already a living, performed work before it was a book — rooted in real theatrical practice","It was written primarily for school reading","It was first performed outside Ghana"],a:1,
-   explain:"The play 'is published after productions in Akan and in English by three different companies in Ghana: the Workers' Brigade Drama Group, Kusum Agoromba (Kusum Players) and the Drama Studio Players and Kusum Agoromba combined.'",
-   story:"This is not a play written for the page — it was born on stage. Its music, movement, and community participation elements were tested in real Ghanaian performances before it was fixed in print."},
-  {s:6,q:"What is the formula 'Keep hoaxing me! / I am hoaxing you and will keep on hoaxing you!' and what does it mean?",
-   opts:["A sign of anger from the audience","A traditional applause form — encouragement for the storyteller to keep the story going artfully","An insult between characters","A signal that the play is almost over"],a:1,
-   explain:"'The formula is practically a form of applause, an encouragement to the Storyteller to sustain his artistry.' In Anansesem tradition, being 'hoaxed' by a great story is a compliment — it means the storyteller has fully captured you.",
-   story:"This exchange is the soul of the tradition. The audience WANTS to be tricked, transported, hoaxed into the story. And isn't that exactly what The Marriage of Anansewa does to us?"},
-  {s:6,q:"What is OHemaa's final verdict on Ananse — is he a villain, a hero, or something more interesting?",
-   opts:["Pure villain — he schemes and lies and deserves to suffer","Pure hero — he provides for his daughter and succeeds","A flawed Everyman — cunning, loving, desperate, funny, and deeply human — which is exactly the point","A cautionary tale about greed with no redemption"],a:2,
-   explain:"Ananse is ALL of us. The play says: laughter is the main response to Ananse — and in our laughter we recognise ourselves. His flaws are human. His love is real. His schemes reflect what poverty can do to a brilliant mind.",
-   story:"🕷️ Congratulations, OHemaa! You've just read The Marriage of Anansewa — through 70 questions, you've lived the whole story. Sutherland's Ananse lives in all of us. That's why he can never be exterminated. And neither can the story."}
+const S1 = [
+  {sec:"Analytical Overview",q:"Efua Sutherland's primary aim in 'The Marriage of Anansewa' is to critique which condition?",o:["The decline of traditional Ghanaian theatre","The condition of greed in modern relationships","The lack of educational curricula for children","The death of indigenous publishing companies"],c:1,n:"The play depicts how greed has conditioned love and marriage institutions."},
+  {sec:"Analytical Overview",q:"In the plot's exposition, Ananse's extortion plan is specifically triggered by:",o:["His desire for a new car","Anansewa's outstanding school fees","The visit of his mother Aya","A request for marriage from Togbe Klu IV"],c:1,n:"He plans to extort money to pay fees and gain wealth."},
+  {sec:"Analytical Overview",q:"The 'falling action' of the play is defined by which specific event?",o:["Anansewa waking from her feigned death","The arrival of Chief-Who-Is-Chief's funeral items","The performance of the ritual of love incantations","Ananse realising he has sent too many letters"],c:1,n:"This moment allows Ananse to conclude who the truly loving husband is."},
+  {sec:"Analytical Overview",q:"Which character represents the gap between modern sophistication and emotional dependence?",o:["Anansewa","Ekuwa","Christie","Aya"],c:2,n:"Christie's outward modernity contrasts with her desperate pursuit of male approval."},
+  {sec:"Analytical Overview",q:"Anansewa's character is described as a 'dramatic device' primarily to interrogate:",o:["The beauty of traditional marriage rites","The marginalisation of women's voices","The efficiency of secretarial training","The cunning nature of the spider-man"],c:1,n:"She serves to interrogate patriarchal control and female silence."},
+  {sec:"Stagecraft & Devices",q:"The use of a web-shaped screen on stage is a symbolic device representing:",o:["The interconnectedness of Ghanaian tribes","Ananse's entrapment of others through schemes","The complexity of modern educational systems","The ancestral protection of the Nsona clan"],c:1,n:"It externalizes his scheming and manipulative strategies."},
+  {sec:"Stagecraft & Devices",q:"What is the function of 'Mboguo' within the dramatic structure?",o:["To manage and distribute stage props","To provide a religious atmosphere through mime","To serve as musical interludes that advance the plot","To deliver letters to the four different chiefs"],c:2,n:"These interludes heighten entertainment and reveal vital information."},
+  {sec:"Stagecraft & Devices",q:"'Selective Modernity' is best exemplified by Ananse's desire to:",o:["Buy a typewriter for his daughter","Renovate his house while following customary rites","Send his daughter to a secretarial school","Use a telephone to contact the Mines"],c:1,n:"He pursues modern comfort while relying on tradition for personal gain."},
+  {sec:"Stagecraft & Devices",q:"The 'Property Man' on stage contributes to the play's realism by:",o:["Acting as the primary storyteller","Manning a property stand and distributing props on cue","Portraying the four chiefs in various scenes","Leading the audience in collective singing"],c:1,n:"He manages props and supports smooth scene transitions."},
+  {sec:"Stagecraft & Devices",q:"Dramatic irony is effectively used in Act Two when:",o:["Anansewa pretends to be dead in front of the messengers","The Postman fails to recognise Ananse as the recipient","Christie reflects on Ananse's silence in a soliloquy","Aya and Ekuwa leave for Nanka to fight enemies"],c:1,n:"The audience knows Ananse's identity, but the Postman does not."},
+  {sec:"Themes & Characters",q:"The theme of 'Female Education' is articulated as 'social capital' through:",o:["Ananse's insistence on the typewriter","Chief-Who-Is-Chief's preference for an educated wife","Christie's role as a fashionable modern woman","Anansewa's ability to write shorthand"],c:1,n:"Education is seen as a criterion of worth for social order and partnership."},
+  {sec:"Themes & Characters",q:"In the analytical framework, the 'climax' of the play is identified as:",o:["When Anansewa is resurrected from death","When the four chiefs all announce they are coming","When Ananse realises the Mines Chief is wealthy","When the letters are posted at the Post Office"],c:1,n:"The arrival of messengers from all four chiefs creates the central chaos."},
+  {sec:"Themes & Characters",q:"Which minor character reflects the collective participation of women in traditional practices?",o:["Christie","Ekuwa","The Postman","The Storyteller"],c:1,n:"As Ananse's aunt, she assists in marriage preparations and rituals."},
+  {sec:"Stagecraft & Devices",q:"The technique of 'Mime' is specifically used to represent which scene?",o:["The writing of the four letters","The church scene and the inviting of witnesses","The battle at the cocoa farm in Nanka","The meeting between Ananse and Chief-Who-Is-Chief"],c:1,n:"Meaning is communicated through physical action rather than dialogue here."},
+  {sec:"The Storyteller",q:"Which phrase describes the Storyteller's relationship to the audience in Anansegoro?",o:["A detached observer","The owner of the story with a right to know everything","A silent director behind the scenes","A character trapped in Ananse's web"],c:1,n:"The narrator is seen as the owner of the story and is personally involved."},
+  {sec:"Themes & Characters",q:"Anansewa's song in Act 1 serves as a vehicle for:",o:["Her acceptance of the marriage proposals","Her open resistance to being sold like a parcel","Her appreciation for her new typewriter","Her desire to marry Chief-Who-Is-Chief"],c:1,n:"Music is used here to reveal her resistance to her father's intentions."},
+  {sec:"The Storyteller",q:"What does the term 'Anansegoro' refer to?",o:["The traditional body of Ananse folktales","A system of traditional theatre combining narration and action","The specific name of Ananse's ancestral clan","The act of paying a head-drink for a bride"],c:1,n:"It is the developed classification of traditional theatre used in the play."},
+  {sec:"Stagecraft & Devices",q:"The 'Flashback' technique is used in the play to clarify:",o:["The death of Anansewa's mother","Ananse's insistence on the taking of photographs","The childhood of Chief-Who-Is-Chief","How Christie and Ananse first met"],c:1,n:"It revives past experiences to explain Ananse's current schemes."},
+  {sec:"Themes & Characters",q:"Ananse's 'materialistic approach' to marriage is most directly contrasted with:",o:["Christie's fashionable appearance","Chief-Who-Is-Chief's progressive understanding","Aya's traditional family values","The Mines Chief's extravagance"],c:1,n:"One sees marriage as possession, the other as partnership."},
+  {sec:"Themes & Characters",q:"The 'Messengers' advance the plot by acting as:",o:["Comedians who distract the audience","Emissaries who make the chiefs' presence felt","Witnesses to Ananse's ritual of love","Teachers at Anansewa's secretarial school"],c:1,n:"They convey intentions and heighten tension without the chiefs appearing."},
+  {sec:"Themes & Characters",q:"Which theme suggests that marriage negotiations are economic metaphors?",o:["Selective Modernity","Cultural Continuity","Female Commodification","Greed"],c:2,n:"Marriage negotiations function as a metaphor for market exchange."},
+  {sec:"Stagecraft & Devices",q:"The 'Soliloquy' in Act 3 provides insight into:",o:["Ananse's fear of the four chiefs","Christie's emotional state regarding Ananse","Anansewa's love for her father","Aya's anger at the cocoa farm fire"],c:1,n:"Christie reflects on Ananse's silence and his obliviousness to her."},
+  {sec:"Stagecraft & Devices",q:"Audience participation in the play is achieved through:",o:["Allowing spectators to vote on the best suitor","Collective singing and clapping","Inviting the audience to help Ananse type letters","Asking the audience to pay Anansewa's fees"],c:1,n:"This transforms spectators into co-performers."},
+  {sec:"Themes & Characters",q:"Ananse's cunning nature is described as coming out specifically in times of:",o:["Great wealth and prosperity","Need and desperation","Religious devotion and prayer","Joy and family celebrations"],c:1,n:"His craftiness reflects how man reacts to desperation."},
+  {sec:"Themes & Characters",q:"The resolution of the play is termed a 'ritual of love' because:",o:["It involves the actual burial of Anansewa","Love is credited with resurrecting Anansewa","The four chiefs finally agree to share Anansewa","Ananse gives up all his wealth for his daughter"],c:1,n:"Anansewa is 'resurrected' from her fake death because of love."},
 ];
 
-const SECTIONS = [
-  {title:"The Spider Spins His Web", desc:"Poverty, planning, and the typewriter letters — Act One begins", icon:"🕸️"},
-  {title:"The Chiefs Take the Bait", desc:"Money arrives, renovations begin, and the scheme spirals — Act One & Two", icon:"💰"},
-  {title:"The Outdooring & The Crisis", desc:"Beauty, ceremony, and a desperate solution — Act Three opens", icon:"🌿"},
-  {title:"The Funeral That Was Never Real", desc:"Four chiefs mourn, secrets are revealed — Act Four's great drama", icon:"⚰️"},
-  {title:"The Miracle of Love", desc:"Anansewa rises, the knot is untied — the resolution", icon:"✨"},
-  {title:"Themes, Characters & Meaning", desc:"What the play really says about Ghana, love, and humanity", icon:"📖"},
-  {title:"The Play's World & Legacy", desc:"Culture, craft, and OHemaa's final reckoning with Ananse", icon:"🕷️"}
+const S2 = [
+  {sec:"Analytical Pt. 2",q:"What is the 'Okyame' in the context of the Storyteller's staff?",o:["A sacred religious artifact","A Chief's official spokesman","A prop used to trap spiders","A symbol of Ananse's poverty"],c:1,n:"The storyteller's staff is an imitation of this official role."},
+  {sec:"Analytical Pt. 2",q:"'Anansesem' is distinguished from 'Anansegoro' by being:",o:["A modern musical drama","A traditional story-telling art of the Akan people","A specific type of funeral dirge","The name of the secretarial school"],c:1,n:"It refers to the body of stories and the performance itself."},
+  {sec:"Analytical Pt. 2",q:"Ananse's character represents 'Everyman' to serve as a medium for:",o:["Entertainment alone","Society to criticise itself","Religious instruction","Promoting foreign cultures"],c:1,n:"He mirrors human follies for societal self-examination."},
+  {sec:"Analytical Pt. 2",q:"The expression 'Ananse's wealth!' is described in the Foreword as:",o:["A compliment for his hard work","A sarcastic expression for temporary success","A literal description of his bank account","A curse from the four chiefs"],c:1,n:"It refers to triumphs that are not likely to last."},
+  {sec:"Analytical Pt. 2",q:"According to the analytical framework, Ananse's greed eventually leads to:",o:["Eternal fame","A moral decay and personal downfall","The successful marriage of his daughter to four men","The renovation of the entire town of Sapaase"],c:1,n:"Excessive desire for wealth causes this decay."},
+  {sec:"Analytical Pt. 2",q:"The 'Post Office Crew' are categorised in the cast as:",o:["Main characters","Minor characters played by the pool of Players","Messengers from the Chief-Who-Is-Chief","Relatives of Christie"],c:1,n:"They are part of the participating audience/players."},
+  {sec:"Analytical Pt. 2",q:"Aya embodies which archetype in her domestic role?",o:["The cunning trickster","The fashionable modern woman","The affectionate, nurturing grandmother","The greedy business partner"],c:2,n:"She provides emotional support and traditional values."},
+  {sec:"Analytical Pt. 2",q:"The 'climax' begins specifically when the four chiefs:",o:["Refuse to pay any more money","Show interest and send messengers simultaneously","Discover that Anansewa is still alive","Threaten to arrest Ananse for fraud"],c:1,n:"The simultaneous interest creates the chaos leading to the fake death."},
+  {sec:"Analytical Pt. 2",q:"The 'falling action' depicts Chief-Who-Is-Chief as:",o:["The wealthiest and most arrogant","The only suitor with good and loving intentions","A man who refuses to help with the funeral","A suitor who was easily deceived by Ananse"],c:1,n:"He is the only one who sends items for the burial."},
+  {sec:"Analytical Pt. 2",q:"The 'Property Man' can also function as a:",o:["Lead singer in the Mboguo","Prompter for the actors","Judge in the final scene","Suitor for Anansewa"],c:1,n:"He is available as an actor and prompter."},
+  {sec:"Analytical Pt. 2",q:"Anansewa's 'seeming passivity' should be read as:",o:["True intellectual weakness","A reflection of limited socio-cultural options","A desire to avoid secretarial training","Fear of the Chief of the Mines"],c:1,n:"It reflects her context rather than personal character."},
+  {sec:"Analytical Pt. 2",q:"Christie's pursuit of Ananse exposes a gap between:",o:["Traditional and modern education","Appearance and reality","Wealth and poverty","Youth and old age"],c:1,n:"Her sophisticated image contrasts with her behaviour."},
+  {sec:"Analytical Pt. 2",q:"The Storyteller has a conventional right to:",o:["Marry Anansewa himself","Know everything and be personally involved","Dismiss the Property Man at any time","Change the script of the play mid-performance"],c:1,n:"He is seen as the 'owner' of the story."},
+  {sec:"Analytical Pt. 2",q:"Mboguo can be used to acquaint the audience with:",o:["The price of the typewriter","Shifts of time or place","The name of the author","The correct way to type a letter"],c:1,n:"It helps develop action and characterisation."},
+  {sec:"Analytical Pt. 2",q:"The phrase 'Exterminate Ananse, and society will be ruined' means:",o:["Ananse is a hero who must be protected","He is a necessary artistic medium for self-criticism","Spiders are essential to the Ghanaian ecosystem","Deceit is the only way for society to function"],c:1,n:"He is essential for society to criticise itself."},
+  {sec:"Analytical Pt. 2",q:"What does the 'Okyame' staff symbolise for the Storyteller?",o:["Authority in the traditional performance","A weapon for self-defense","A tool for the Property Man","A gift from the Chief of Akate"],c:0,n:"It is an adaptation of the Chief's spokesman's staff."},
+  {sec:"Analytical Pt. 2",q:"The use of 'Letters' in Act 1 is a narrative device that:",o:["Delays the marriage plot indefinitely","Initiates the plot and enables simultaneous manipulation","Proves Anansewa is the best typist in Ghana","Warns the chiefs about Ananse's greed"],c:1,n:"It initiates the plot and creates tension."},
+  {sec:"Analytical Pt. 2",q:"In Act 2, the 'Postman' encounters Ananse but:",o:["Delivers a letter to Christie instead","Fails to recognise him as the intended recipient","Asks for a bribe to deliver the telegram","Tells him the Chief of Sapaase is dead"],c:1,n:"This gap in knowledge creates dramatic irony."},
+  {sec:"Analytical Pt. 2",q:"The 'Spider's Web' device signals Ananse's withdrawal for:",o:["Sleep and relaxation","Concealment and strategic reassessment","Traditional prayer and fasting","Counting the money he has extorted"],c:1,n:"He retreats behind the web during failures for reassessment."},
+  {sec:"Analytical Pt. 2",q:"Which theme highlights the priority of wealth over human relationships?",o:["Female Education","Selective Modernity","Greed","Cultural Continuity"],c:2,n:"Ananse's schemes put Anansewa at emotional risk."},
+  {sec:"Analytical Pt. 2",q:"The Storyteller describes Ananse's successes as:",o:["Permanent and glorious","Doubtful and temporary","The result of pure honesty","Recognised by all characters in the play"],c:1,n:"His schemes usually ruin him and end in impoverishment."},
+  {sec:"Analytical Pt. 2",q:"The 'Mime' technique in the church scene communicates meaning through:",o:["Secretarial shorthand","Physical action rather than spoken dialogue","Choral singing in the background","The use of a glass coffin"],c:1,n:"It communicates entirely through action."},
+  {sec:"Analytical Pt. 2",q:"Anansewa's dependence is reinforced when Ananse threatens to:",o:["Burn her typewriter","Withdraw financial support for her education","Marry Christie himself","Send her to the Chief of the Mines"],c:1,n:"This coercion emphasises the vulnerability of women."},
+  {sec:"Analytical Pt. 2",q:"The play's structure ensures clarity by having the Storyteller:",o:["Write the script on a blackboard","Guide the audience's understanding of events","Play the role of Anansewa","Remain silent throughout Act 4"],c:1,n:"He ensures clarity and guides the storyline."},
+  {sec:"Analytical Pt. 2",q:"What role does Efua Sutherland play in modern Ghanaian theatre?",o:["She was a minor playwright with little influence","She was a key figure who founded the Ghana Drama Studio","She primarily focused on film acting","She was the first woman to marry a chief in Ghana"],c:1,n:"She founded the Society of Writers, Drama Studio, and Experimental Theatre."},
 ];
 
-let currentQ = 0, sectionScore = 0, totalScore = 0, timerInterval = null, timeLeft = 30;
-const TOTAL = 30;
+const S3 = [
+  {sec:"The Script",q:"In the Foreword, what is the humorous story-telling term for being 'tricked'?",o:["Spun","Entrapped","Hoaxed","Webbed"],c:2,n:"Listeners encourage the narrator by saying 'Keep hoaxing me!'"},
+  {sec:"The Script",q:"At the start of Act 1, Ananse is wearing:",o:["A brand-new kente cloth","A shabby raincoat","A business suit","A traditional priest's robe"],c:1,n:"He enters hastily escaping the rain."},
+  {sec:"The Script",q:"Ananse calls for the typewriter he bought for Anansewa at a price that:",o:["Was a gift from the Chiefs","Nearly drove him to sell himself","Was paid for by Christie","Was half-price during a sale"],c:1,n:"This emphasises his financial desperation."},
+  {sec:"The Script",q:"What does Ananse specifically want for his 'comfortable future'?",o:["A straw-stuffed mattress","A soft, bouncy Dunlopillo mattress","A wooden stool from Nanka","A hammock in the garden"],c:1,n:"He uses this as an index of his lack of comfort."},
+  {sec:"The Script",q:"When typing the letters, Anansewa is told that 'Dear Chief of Sapa' is:",o:["Perfect and respectful","Too ordinary","A secret code","Too aggressive"],c:1,n:"He replaces it with grandiose appellations."},
+  {sec:"The Script",q:"The appellation 'Mighty-Tree-Of-Ancient-Origin' is addressed to:",o:["Togbe Klu IV","The Chief of the Mines","The Chief of Sapaase","Chief-Who-Is-Chief"],c:2,n:"This is the first letter Ananse dictates."},
+  {sec:"The Script",q:"Which Chief is described as 'Prickly-Pear! Cactus keeping guard'?",o:["Chief of Sapaase","Togbe Klu IV","Chief of the Mines","The unnamed chief from Mali"],c:1,n:"He is the Chief of Akate."},
+  {sec:"The Script",q:"The Chief of the Mines is addressed with a poem about:",o:["Driver ants being astir","Fire-extinguishers","Golden stools","Water to refresh friends"],c:0,n:"This identity is whispered into Anansewa's ear."},
+  {sec:"The Script",q:"Which Chief is described as the 'Fire-Extinguisher'?",o:["Togbe Klu IV","Chief of Sapaase","Chief-Who-Is-Chief","The Chief of the Mines"],c:2,n:"This title is used in his highly speed-recited letter."},
+  {sec:"The Script",q:"How much money does Ananse count out for Anansewa's fees in Act 1?",o:["Ten clean cedis","One hundred and twenty cedis","Fifty guineas","Five hundred cedis"],c:1,n:"It is described as clean money from his bulging wallet."},
+  {sec:"The Script",q:"What is Ananse's 'oracle' according to his own words?",o:["His bulging wallet","The typewriter","His eyes","The Storyteller"],c:2,n:"He quotes the rhesus monkey saying 'My eyes are my oracle.'"},
+  {sec:"The Script",q:"In Act 1, Anansewa realises her father is 'selling her' and sings that she is not:",o:["A schoolgirl","A parcel to a customer","A bota bead","A secretarial student"],c:1,n:"She insists she will select her lover herself."},
+  {sec:"The Script",q:"Ananse organises a 'most lively competition' around his daughter to:",o:["Make her the most famous woman in Ghana","Let human nature help disentangle the knot","Prove that he is the smartest man in Nanka","Get four cars instead of one"],c:1,n:"He counts on human nature to decide the winner."},
+  {sec:"The Script",q:"What is the 'head-drink' mentioned in the script?",o:["A celebratory gin after a hunt","A token sum and drinks to establish marriage legally","A ritual bath given to the bride","The water Ananse drinks to cure his headache"],c:1,n:"It is a formal token handed to the bride's family."},
+  {sec:"The Script",q:"The Postman delivers a letter in Act 2 to 'AW/6615 Lagoon Street' which is:",o:["A local hospital","Ananse's house","The Post Office headquarters","The Chief of the Mines' palace"],c:1,n:"The address is confirmed by the Storyteller."},
+  {sec:"The Script",q:"In Act 2, Ananse tells the Property Man to buy every newspaper to search for:",o:["Business advertisements","Notices of memorial services","News about the Chief of the Mines","Secretarial school results"],c:1,n:"He wants to attend services to 'deposit with the spenders.'"},
+  {sec:"The Script",q:"The workmen doubling their contract time to ten weeks is because:",o:["Ananse personally demanded it","The house is too large to finish quickly","They can exploit the 'man in their pocket'","There is a lack of building materials"],c:2,n:"They realise they can finish slowly and stay longer."},
+  {sec:"The Script",q:"Who is 'Abena' in the Mboguo song 'Am I Not Odum's Child'?",o:["Ananse's first wife","A delicate daughter unprepared for hardship","The Chief of Sapaase's mother","The girl Akwasi is chasing"],c:1,n:"She is the unseasoned one who'd 'rather be dead.'"},
+  {sec:"The Script",q:"Aya is upset by Anansewa's outdooring because it is:",o:["Five years too late","Too expensive for the family","Organised by the Storyteller","Not involving the four chiefs"],c:0,n:"She says it should have happened when she became a woman."},
+  {sec:"The Script",q:"What specific ritual item is 'passed over' Anansewa's head during the outdooring?",o:["A kente cloth","An egg","A glass of gin","A typewriter ribbon"],c:1,n:"It is her 'soul's egg' to attract good fortune."},
+  {sec:"The Script",q:"Ananse lies to Aya and Ekuwa about a fire at the cocoa farm in:",o:["Sapaase","Akate","Nanka","Lagoon Street"],c:2,n:"This is his ruse to get them to leave the house."},
+  {sec:"The Script",q:"How does Ananse instruct Anansewa to 'die' in preparation?",o:["To swallow a sleeping pill","To stiffen her limbs and hold her breath","To hide behind the spider's web","To run away to Mexico"],c:1,n:"He tells her to look as though she is dead."},
+  {sec:"The Script",q:"Which Chief sends a 'glass coffin' to the funeral?",o:["Chief of Sapaase","Chief of the Mines","Togbe Klu IV","Chief-Who-Is-Chief"],c:3,n:"He sends it to do what a 'real husband does.'"},
+  {sec:"The Script",q:"In the final libation, Ananse asks the ancestors to:",o:["Punish the three chiefs who sent bad gifts","Wake Anansewa if Chief-Who-Is-Chief is the right man","Burn down the rest of the cocoa farm","Give him a new soft Dunlopillo mattress"],c:1,n:"He asks them to 'Wake her!' if the marriage is desired."},
+  {sec:"The Script",q:"Anansewa's final 'awakening' is attributed by Ananse to the power of:",o:["Modern medicine","Amazing love","Traditional incantations","Her secretarial certificate"],c:1,n:"He claims love has won a victory."},
+];
 
-function startQuiz() {
-  document.getElementById('welcome').style.display = 'none';
-  document.getElementById('quiz-area').style.display = 'block';
-  loadQuestion();
+const SETS = [
+  {id:0,label:"Set 1",title:"Analytical Overview — Part 1",icon:"🕷️",desc:"Dramatic devices, themes, characterisation & analytical framework (Q1–25)",qs:S1,col:"#f5a623"},
+  {id:1,label:"Set 2",title:"Analytical Overview — Part 2",icon:"🎭",desc:"Anansegoro, stagecraft, Storyteller's role & deeper thematic analysis (Q26–50)",qs:S2,col:"#a78bfa"},
+  {id:2,label:"Set 3",title:"The Script Itself",icon:"📜",desc:"Specific plot details, dialogue, character actions & scene-by-scene events (Q51–75)",qs:S3,col:"#34d399"},
+];
+
+const L=['A','B','C','D'], T=30;
+const OK=["Correct, Ohemaa!","Brilliant!","Spot on!","That's right!","Nailed it!","Excellent!","Perfect!","Well done!"];
+const NO=["Not quite — see the note!","Review this one carefully.","Tricky! Check the explanation.","Close, but not right.","Study this one again!"];
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+
+function Particles(){
+  const ps=Array.from({length:22},(_,i)=>({
+    left:Math.random()*100,delay:Math.random()*10,
+    dur:7+Math.random()*9,size:2+Math.random()*5,
+    col:['rgba(245,166,35,0.35)','rgba(167,139,250,0.35)','rgba(52,211,153,0.3)','rgba(255,255,255,0.17)'][i%4]
+  }));
+  return <div className="particles">{ps.map((p,i)=><div key={i} className="particle" style={{left:p.left+'%',bottom:'-10px',width:p.size+'px',height:p.size+'px',background:p.col,animationDelay:p.delay+'s',animationDuration:p.dur+'s'}}/>)}</div>;
 }
 
-function loadQuestion() {
-  if (currentQ >= QUESTIONS.length) { showFinal(); return; }
-  const q = QUESTIONS[currentQ];
-  const sIdx = q.s;
-  const sect = SECTIONS[sIdx];
-  const qInSection = currentQ % 10;
+function App(){
+  const [view,setView]=useState('name');
+  const [name,setName]=useState('');
+  const [qs,setQs]=useState([]);
+  const [slbl,setSlbl]=useState('');
+  const [scol,setScol]=useState('#f5a623');
+  const [sidx,setSidx]=useState(0);
+  const [qi,setQi]=useState(0);
+  const [sel,setSel]=useState(null);
+  const [rev,setRev]=useState(false);
+  const [ans,setAns]=useState([]);
+  const [tl,setTl]=useState(T);
+  const [streak,setStreak]=useState(0);
+  const [best,setBest]=useState(0);
+  const tmr=useRef(null);
 
-  // Section banner
-  document.getElementById('sect-num').textContent = `Section ${sIdx+1} of 7 — ${sect.icon}`;
-  document.getElementById('sect-title').textContent = sect.title;
-  document.getElementById('sect-desc').textContent = sect.desc;
+  useEffect(()=>{
+    if(view!=='quiz') return;
+    if(rev){clearInterval(tmr.current);return;}
+    tmr.current=setInterval(()=>{
+      setTl(t=>{
+        if(t<=1){clearInterval(tmr.current);reveal(null);return 0;}
+        return t-1;
+      });
+    },1000);
+    return()=>clearInterval(tmr.current);
+  },[view,qi,rev]);
 
-  // Progress
-  const pct = (currentQ / QUESTIONS.length) * 100;
-  document.getElementById('prog-fill').style.width = pct + '%';
-  document.getElementById('prog-label').textContent = `Q${currentQ+1} of ${QUESTIONS.length}`;
-  document.getElementById('total-score-display').textContent = `${totalScore} / ${currentQ}`;
+  const reveal=(idx)=>{
+    const q=qs[qi];
+    const ok=idx===q.c;
+    const ns=ok?streak+1:0;
+    setStreak(ns); setBest(b=>Math.max(b,ns));
+    setAns(p=>[...p,{chosen:idx,correct:q.c,ok}]);
+    setSel(idx); setRev(true);
+  };
 
-  // Question
-  document.getElementById('q-num-label').textContent = `Question ${currentQ+1} — ${qInSection+1} of 10 in this section`;
-  document.getElementById('q-text').textContent = q.q;
+  const pick=(idx)=>{
+    if(rev)return;
+    clearInterval(tmr.current);
+    setSel(idx);
+    setTimeout(()=>reveal(idx),180);
+  };
 
-  // Options
-  const letters = ['A','B','C','D'];
-  const container = document.getElementById('options-container');
-  container.innerHTML = '';
-  q.opts.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'opt-btn';
-    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
-    btn.onclick = () => selectAnswer(i);
-    container.appendChild(btn);
-  });
+  const next=()=>{
+    if(qi+1>=qs.length){submit();setView('results');}
+    else{setQi(qi+1);setSel(null);setRev(false);setTl(T);}
+  };
 
-  // Feedback
-  const fb = document.getElementById('feedback-box');
-  fb.className = 'feedback-box';
-  fb.style.display = 'none';
+  const submit=async()=>{
+    const sc=ans.filter(a=>a.ok).length;
+    try{await fetch(GSURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentName:name,sheet:'Sheet1',rawScore:sc,finalScore:sc,totalQuestions:qs.length,percentage:((sc/qs.length)*100).toFixed(1),setUsed:slbl,timestamp:new Date().toLocaleString()})});}catch(e){}
+  };
 
-  // Next btn
-  document.getElementById('next-btn').classList.remove('visible');
+  const startSet=(s)=>{
+    setQs(s.qs);setSlbl(s.label+' — '+s.title);setScol(s.col);setSidx(s.id);
+    setQi(0);setAns([]);setSel(null);setRev(false);setTl(T);setStreak(0);setBest(0);
+    setView('quiz');
+  };
 
-  startTimer();
-}
+  const score=ans.filter(a=>a.ok).length;
+  const pct=qs.length?Math.round((score/qs.length)*100):0;
+  const grade=(p)=>{
+    if(p>=90)return{lbl:'Outstanding! 🏆',bg:'#34d399',col:'#022c22'};
+    if(p>=75)return{lbl:'Excellent! ⭐',bg:'#f5a623',col:'#1a0a00'};
+    if(p>=60)return{lbl:'Good work! 👍',bg:'#60a5fa',col:'#1e3a5f'};
+    if(p>=50)return{lbl:'Keep going! 📖',bg:'#a78bfa',col:'#1e1b4b'};
+    return{lbl:'More revision needed 💪',bg:'#f87171',col:'#2c0000'};
+  };
+  const g=grade(pct);
+  const tc=tl>15?'tok':tl>8?'twarn':'tdanger';
 
-function startTimer() {
-  timeLeft = 30;
-  clearInterval(timerInterval);
-  updateTimerUI();
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerUI();
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      timeExpired();
-    }
-  }, 1000);
-}
+  if(view==='name') return(
+    <div className="app"><Particles/><div className="web-bg"/>
+      <div className="card">
+        <div style={{textAlign:'center',marginBottom:28}}>
+          <div style={{fontSize:'3.2rem',marginBottom:10}}>🕸️</div>
+          <h1>Anansewa Revision</h1>
+          <p className="sub">The Marriage of Anansewa · Efua Sutherland<br/>75 questions across 3 sets — test your mastery!</p>
+        </div>
+        <input type="text" placeholder="Enter your name..." value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&setView('choose')}/>
+        <button className="btn btn-primary" onClick={()=>{if(name.trim())setView('choose');}}>Let's go →</button>
+      </div>
+    </div>
+  );
 
-function updateTimerUI() {
-  const num = document.getElementById('timer-num');
-  const circle = document.getElementById('timer-circle');
-  num.textContent = timeLeft;
-  const circ = 2 * Math.PI * 27;
-  const offset = circ * (1 - timeLeft / 30);
-  circle.style.strokeDashoffset = offset;
-  if (timeLeft <= 10) {
-    circle.style.stroke = '#E24B4A';
-    num.style.color = '#E24B4A';
-    num.classList.add('time-warn');
-  } else if (timeLeft <= 20) {
-    circle.style.stroke = '#EF9F27';
-    num.style.color = '#EF9F27';
-    num.classList.remove('time-warn');
-  } else {
-    circle.style.stroke = '#ef9f27';
-    num.style.color = '#ef9f27';
-    num.classList.remove('time-warn');
-  }
-}
+  if(view==='choose') return(
+    <div className="app"><Particles/><div className="web-bg"/>
+      <div className="card">
+        <h2>Welcome, {name.split(' ')[0]}! 👋</h2>
+        <p className="sub">Three sets of 25 questions each. Pick a set to begin — 30 seconds per question.</p>
+        <div className="set-cards">
+          {SETS.map(s=>(
+            <div key={s.id} className="set-card" style={{'--hc':s.col}} onClick={()=>startSet(s)}
+              onMouseEnter={e=>{e.currentTarget.style.background=`${s.col}18`;e.currentTarget.style.borderColor=`${s.col}55`;}}
+              onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,255,255,0.06)';e.currentTarget.style.borderColor='rgba(255,255,255,0.13)';}}>
+              <div className="icon">{s.icon}</div>
+              <div style={{flex:1}}><h3>{s.title}</h3><p>{s.desc}</p></div>
+              <div className="badge" style={{background:`${s.col}22`,color:s.col}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
-function timeExpired() {
-  disableOptions();
-  showFeedback(false, "⏱ Time's up!", QUESTIONS[currentQ].explain, QUESTIONS[currentQ].story);
-  document.getElementById('next-btn').classList.add('visible');
-}
-
-function selectAnswer(idx) {
-  clearInterval(timerInterval);
-  disableOptions();
-  const q = QUESTIONS[currentQ];
-  const opts = document.querySelectorAll('.opt-btn');
-  const correct = idx === q.a;
-  opts[q.a].classList.add('correct');
-  if (!correct) opts[idx].classList.add('wrong');
-  opts.forEach((btn, i) => { if (i !== idx && i !== q.a) btn.classList.add('dim'); });
-
-  if (correct) { sectionScore++; totalScore++; fireConfetti(); }
-  showFeedback(correct,
-    correct ? "🎉 Correct, OHemaa!" : "❌ Not quite...",
-    q.explain, q.story);
-  document.getElementById('next-btn').classList.add('visible');
-}
-
-function disableOptions() {
-  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
-}
-
-function showFeedback(correct, verdict, explain, story) {
-  const fb = document.getElementById('feedback-box');
-  fb.className = 'feedback-box ' + (correct ? 'correct-fb' : 'wrong-fb');
-  fb.style.display = 'block';
-  document.getElementById('fb-verdict').textContent = verdict;
-  document.getElementById('fb-explain').textContent = explain;
-  document.getElementById('fb-story').textContent = '📖 Story context: ' + story;
-}
-
-function nextQuestion() {
-  currentQ++;
-  if (currentQ % 10 === 0) {
-    document.getElementById('quiz-area').style.display = 'none';
-    showSectionScore();
-  } else {
-    loadQuestion();
-  }
-}
-
-function showSectionScore() {
-  const sIdx = Math.floor((currentQ - 1) / 10);
-  const sect = SECTIONS[sIdx];
-  const ss = document.getElementById('section-score');
-  ss.className = 'section-score visible';
-
-  document.getElementById('ss-icon').textContent = sect.icon;
-  document.getElementById('ss-title').textContent = sect.title + ' — Complete!';
-  document.getElementById('ss-score').textContent = sectionScore;
-
-  const stars = sectionScore >= 9 ? '⭐⭐⭐' : sectionScore >= 7 ? '⭐⭐' : sectionScore >= 5 ? '⭐' : '💀';
-  document.getElementById('ss-stars').textContent = stars;
-
-  const msgs = [
-    `Acts One begins! Ananse is desperate, scheming, and brilliant. You've seen how it all starts. ${sectionScore >= 7 ? "You're reading this story like a Ghanaian grandmother!" : "Keep going — the web gets more tangled!"}`,
-    `The money is flowing! Ananse is renovating, going to church, and collecting from chiefs. ${sectionScore >= 7 ? "You know every thread of this web!" : "The best is yet to come!"}`,
-    `The outdooring was beautiful and the crisis is real. Ananse has asked Anansewa to die for love. ${sectionScore >= 7 ? "Outstanding reading, OHemaa!" : "The funeral is next — don't miss a thing!"}`,
-    `The fake funeral was the play's greatest drama. Four chiefs, four revelations. ${sectionScore >= 7 ? "You've been reading carefully — it shows!" : "The miracle is coming — stay sharp!"}`,
-    `The miracle happened! The scheme worked. Love untied the knot. ${sectionScore >= 7 ? "You understand this play deeply!" : "Two more sections — keep going!"}`,
-    `Themes and meaning explored! You're thinking like a literary scholar now. ${sectionScore >= 7 ? "Sutherland would be proud!" : "Almost there — one more section!"}`,
-    `YOU'VE FINISHED! The full play, all 70 questions! ${sectionScore >= 7 ? "OHemaa, you read this brilliantly!" : "You've read the whole play — celebrate!"}`
-  ];
-  document.getElementById('ss-sub').textContent = msgs[sIdx];
-
-  if (currentQ >= QUESTIONS.length) {
-    document.getElementById('continue-btn').textContent = 'See Final Score 🏆';
-  } else {
-    document.getElementById('continue-btn').textContent = `Continue to Section ${sIdx+2} →`;
-  }
-
-  if (sectionScore >= 8) { for(let i=0;i<30;i++) spawnConfetti(); }
-  sectionScore = 0;
-}
-
-function continueQuiz() {
-  document.getElementById('section-score').className = 'section-score';
-  if (currentQ >= QUESTIONS.length) {
-    showFinal();
-  } else {
-    document.getElementById('quiz-area').style.display = 'block';
-    loadQuestion();
-  }
-}
-
-function showFinal() {
-  document.getElementById('section-score').className = 'section-score';
-  document.getElementById('quiz-area').style.display = 'none';
-  const fs = document.getElementById('final-score');
-  fs.className = 'final-score visible';
-  document.getElementById('fs-score').textContent = totalScore;
-
-  const pct = totalScore / QUESTIONS.length;
-  let stars, msg;
-  if (pct >= 0.9) {
-    stars = '🌟🌟🌟🌟🌟';
-    msg = "OHemaa, you are a MASTER of this play! You caught every twist of Ananse's web, every nuance of Anansewa's love, and every moral question Sutherland wove into the story. You didn't just read The Marriage of Anansewa — you lived it. Kweku Ananse himself would bow to your knowledge.";
-  } else if (pct >= 0.75) {
-    stars = '⭐⭐⭐⭐';
-    msg = "Excellent work, OHemaa! You know this play deeply — Ananse's schemes, Anansewa's heart, the chiefs' characters. A few threads slipped through your web, but you have read this play properly. Sutherland would be proud.";
-  } else if (pct >= 0.6) {
-    stars = '⭐⭐⭐';
-    msg = "Good reading, OHemaa! You followed the main story and caught the key moments. Some of the deeper themes and cultural details were tricky, but you've experienced the whole play. Consider another round to catch what you missed!";
-  } else if (pct >= 0.4) {
-    stars = '⭐⭐';
-    msg = "You've seen the whole story, OHemaa — that's what matters! The play is rich and complex, and some questions were genuinely tricky. Play again and you'll discover more each time. Ananse always rewards a second visit.";
-  } else {
-    stars = '🕷️';
-    msg = "The web has tangled you a little, OHemaa! But you've read every question and seen the whole story. Play again — Ananse's schemes reveal themselves differently each time. The spider always wins eventually!";
-  }
-
-  document.getElementById('fs-stars').textContent = stars;
-  document.getElementById('fs-msg').textContent = msg;
-  for(let i=0;i<50;i++) spawnConfetti();
-}
-
-function restartQuiz() {
-  currentQ = 0; sectionScore = 0; totalScore = 0;
-  document.getElementById('final-score').className = 'final-score';
-  document.getElementById('welcome').style.display = 'block';
-  document.getElementById('quiz-area').style.display = 'none';
-}
-
-function fireConfetti() {
-  for(let i=0;i<12;i++) spawnConfetti();
-}
-
-function spawnConfetti() {
-  const colors = ['#c9920a','#ef9f27','#97C459','#378ADD','#D85A30','#f5e8c8'];
-  const el = document.createElement('div');
-  el.className = 'confetti-piece';
-  el.style.left = Math.random()*100+'vw';
-  el.style.top = '-10px';
-  el.style.background = colors[Math.floor(Math.random()*colors.length)];
-  el.style.transform = `rotate(${Math.random()*360}deg)`;
-  el.style.animationDuration = (1.5+Math.random()*2)+'s';
-  el.style.animationDelay = Math.random()*0.5+'s';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3500);
-}
-
-// Draw spider web on canvas
-const canvas = document.getElementById('web-canvas');
-const ctx = canvas.getContext('2d');
-function drawWeb() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle = '#c9920a';
-  ctx.lineWidth = 0.8;
-  const cx = canvas.width * 0.85, cy = 0;
-  const rings = 8, spokes = 12;
-  for(let r=0;r<rings;r++) {
-    const rad = (r+1) * 90;
-    ctx.beginPath();
-    for(let s=0;s<spokes;s++) {
-      const a = (s/spokes)*Math.PI*2;
-      const na = ((s+1)/spokes)*Math.PI*2;
-      ctx.moveTo(cx+Math.cos(a)*rad, cy+Math.sin(a)*rad);
-      ctx.lineTo(cx+Math.cos(na)*rad, cy+Math.sin(na)*rad);
-    }
-    ctx.stroke();
-  }
-  for(let s=0;s<spokes;s++) {
-    const a = (s/spokes)*Math.PI*2;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx+Math.cos(a)*720, cy+Math.sin(a)*720);
-    ctx.stroke();
+  if(view==='quiz'){
+    const q=qs[qi];
+    const prog=(qi/qs.length)*100;
+    const lastAns=ans[ans.length-1];
+    return(
+      <div className="app"><Particles/><div className="web-bg"/>
+        <div className="card">
+          <div className="progress-wrap">
+            <div className="progress-top">
+              <span>{qi+1} / {qs.length}</span>
+              <span className="streak-txt">
+                {streak>=2?<span style={{color:scol,fontWeight:700}}>🔥 {streak} in a row!</span>
+                  :<span style={{color:'rgba(255,255,255,0.48)'}}>{score} correct so far</span>}
+              </span>
+            </div>
+            <div className="progress-bar"><div className="progress-fill" style={{width:prog+'%',background:`linear-gradient(90deg,${scol},#34d399)`}}/></div>
+          </div>
+          <div className="timer-row">
+            <div style={{flex:1}}><div className="stag" style={{background:`${scol}22`,color:scol}}>{q.sec}</div></div>
+            <div className={`timer-circle ${tc}`}>{tl}s</div>
+          </div>
+          <p className="q-text">{q.q}</p>
+          <div className="options">
+            {q.o.map((opt,idx)=>{
+              let cls='option';
+              if(rev){
+                if(idx===q.c)cls+=' cor';
+                else if(idx===sel&&idx!==q.c)cls+=' wrg';
+                cls+=' locked';
+              } else if(idx===sel) cls+=' sel';
+              return(
+                <div key={idx} className={cls} onClick={()=>pick(idx)}>
+                  <span className="opt-letter">{L[idx]}</span>
+                  <span>{opt}</span>
+                </div>
+              );
+            })}
+          </div>
+          {rev&&(
+            <div className={`fb ${lastAns?.ok?'fb-ok':'fb-no'}`}>
+              <strong>{lastAns?.ok?rnd(OK):rnd(NO)}</strong>
+              <br/><span style={{opacity:0.88}}>{q.n}</span>
+            </div>
+          )}
+          {rev&&(
+            <button className="next-btn" style={{background:`linear-gradient(135deg,${scol},#34d399)`}} onClick={next}>
+              {qi+1>=qs.length?'See my results 🎉':'Next question →'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
   }
 
-  const cx2 = canvas.width*0.1, cy2 = canvas.height*0.9;
-  for(let r=0;r<6;r++) {
-    const rad = (r+1)*70;
-    ctx.beginPath();
-    for(let s=0;s<8;s++) {
-      const a=(s/8)*Math.PI*2, na=((s+1)/8)*Math.PI*2;
-      ctx.moveTo(cx2+Math.cos(a)*rad, cy2+Math.sin(a)*rad);
-      ctx.lineTo(cx2+Math.cos(na)*rad, cy2+Math.sin(na)*rad);
-    }
-    ctx.stroke();
-  }
-  for(let s=0;s<8;s++) {
-    const a=(s/8)*Math.PI*2;
-    ctx.beginPath();
-    ctx.moveTo(cx2,cy2);
-    ctx.lineTo(cx2+Math.cos(a)*420, cy2+Math.sin(a)*420);
-    ctx.stroke();
-  }
+  if(view==='results') return(
+    <div className="app"><Particles/><div className="web-bg"/>
+      <div className="card">
+        <div style={{textAlign:'center',marginBottom:8}}>
+          <div style={{fontSize:'2.5rem',marginBottom:8}}>🎭</div>
+          <h2>Done, {name.split(' ')[0]}!</h2>
+          <p style={{fontSize:'0.8rem',color:'rgba(255,255,255,0.38)',marginTop:4}}>{slbl}</p>
+        </div>
+        <div className="score-big">{score}/{qs.length}</div>
+        <p className="score-lbl">{pct}% correct</p>
+        <div className="grade-badge" style={{background:g.bg,color:g.col}}>{g.lbl}</div>
+        <div className="stat-row">
+          <div className="stat"><div className="n" style={{color:'#34d399'}}>{score}</div><div className="l">Correct</div></div>
+          <div className="stat"><div className="n" style={{color:'#f87171'}}>{qs.length-score}</div><div className="l">Missed</div></div>
+          <div className="stat"><div className="n" style={{color:scol}}>{best}</div><div className="l">Best streak</div></div>
+        </div>
+        <div className="advice">
+          {pct>=80?"Excellent command of the play! Review any missed items and you are fully prepared."
+          :pct>=60?"Good foundation! Pay closer attention to the analytical devices — Mboguo, Mime, and the Spider's Web symbolism are especially important."
+          :"Focus on the core themes: greed, female commodification, and how Anansegoro works as a theatrical form. Revisit the Storyteller's role and the dramatic structure."}
+        </div>
+        <div className="btn-row">
+          <button className="btn-sec" onClick={()=>startSet(SETS[sidx])}>Retry this set</button>
+          <button className="btn-sec" onClick={()=>setView('choose')}>Try another set</button>
+        </div>
+        <button className="btn btn-primary" onClick={()=>{setView('name');setName('');}}>All done ✓</button>
+      </div>
+    </div>
+  );
 }
-drawWeb();
-window.addEventListener('resize', drawWeb);
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
 </script>
 </body>
 </html>
