@@ -3,177 +3,261 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Ohemaa's Anansewa Quiz</title>
+<title>Electronics Revision Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800;900&display=swap" rel="stylesheet"/>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0d1117 0%, #1a0a2e 35%, #2d1b69 65%, #0d4a2e 100%);
-  background-attachment: fixed;
-  color: #fff;
+:root {
+  --bg: #060a12;
+  --surface: #0d1520;
+  --border: rgba(0,220,255,0.12);
+  --accent: #00dcff;
+  --accent2: #ff6b35;
+  --accent3: #a8ff3e;
+  --text: #e8f4f8;
+  --muted: rgba(232,244,248,0.45);
+  --theory: #00dcff;
+  --calc: #ff6b35;
 }
-.particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-.particle { position: absolute; border-radius: 50%; animation: floatUp linear infinite; }
-@keyframes floatUp {
-  0% { transform: translateY(100vh) scale(0); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 0.6; }
-  100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Syne',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
 }
-.web-bg {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 0; opacity: 0.03;
-  background-image: repeating-linear-gradient(0deg, #fff 0, #fff 1px, transparent 0, transparent 50%),
-    repeating-linear-gradient(90deg, #fff 0, #fff 1px, transparent 0, transparent 50%);
-  background-size: 40px 40px;
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,220,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,107,53,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 50% 50%, rgba(168,255,62,0.03) 0%, transparent 70%);
+  pointer-events:none;z-index:0;
 }
-.app { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.card {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 26px;
-  padding: 40px;
-  width: 100%;
-  max-width: 700px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+.grid-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,220,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,220,255,0.03) 1px, transparent 1px);
+  background-size:48px 48px;
 }
-h1 { font-size: 2.1rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
-h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; }
-.sub { color: rgba(255,255,255,0.55); font-size: 0.93rem; margin-bottom: 28px; line-height: 1.6; }
-input[type=text] {
-  width: 100%;
-  background: rgba(255,255,255,0.09);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  border-radius: 14px;
-  padding: 15px 18px;
-  color: #fff;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  margin-bottom: 20px;
+.app{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{
+  width:100%;max-width:740px;
+  background:rgba(13,21,32,0.85);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:44px;
+  box-shadow:0 0 60px rgba(0,220,255,0.05), 0 30px 60px rgba(0,0,0,0.6);
+  backdrop-filter:blur(20px);
 }
-input[type=text]::placeholder { color: rgba(255,255,255,0.35); }
-input[type=text]:focus { border-color: rgba(245,166,35,0.7); box-shadow: 0 0 0 3px rgba(245,166,35,0.1); }
-.btn {
-  display: block; width: 100%;
-  padding: 16px; border-radius: 14px;
-  border: none; font-size: 1rem; font-weight: 700;
-  cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.logo-icon{
+  width:48px;height:48px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),rgba(0,220,255,0.3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;flex-shrink:0;
+  box-shadow:0 0 20px rgba(0,220,255,0.25);
 }
-.btn-primary { background: linear-gradient(135deg, #f5a623, #e8612a); color: #1a0a00; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(245,166,35,0.4); }
-.btn-primary:active { transform: translateY(0); }
-.set-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
-.set-card {
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.13);
-  border-radius: 18px; padding: 20px 22px;
-  cursor: pointer; transition: all 0.25s;
-  display: flex; align-items: center; gap: 16px;
+.logo-text{font-size:0.75rem;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+h1{font-size:2.4rem;font-weight:900;line-height:1.1;margin-bottom:8px;letter-spacing:-1px;}
+h1 span{
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.set-card:hover { transform: translateX(5px); }
-.set-card .icon { font-size: 2rem; flex-shrink: 0; }
-.set-card h3 { font-size: 0.98rem; font-weight: 700; margin-bottom: 4px; }
-.set-card p { font-size: 0.8rem; color: rgba(255,255,255,0.48); line-height: 1.5; }
-.set-card .badge {
-  margin-left: auto; flex-shrink: 0;
-  font-size: 0.72rem; font-weight: 700;
-  padding: 4px 10px; border-radius: 99px;
+.sub{font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:32px;font-family:'Space Mono',monospace;}
+
+/* name input */
+.input-wrap{position:relative;margin-bottom:20px;}
+input[type=text]{
+  width:100%;background:rgba(0,220,255,0.05);
+  border:1.5px solid rgba(0,220,255,0.2);
+  border-radius:12px;padding:15px 20px;
+  color:var(--text);font-size:1rem;font-family:'Syne',sans-serif;
+  outline:none;transition:all 0.2s;
 }
-.progress-wrap { margin-bottom: 18px; }
-.progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.84rem; color: rgba(255,255,255,0.58); }
-.progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
-.timer-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-.timer-circle {
-  width: 52px; height: 52px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; font-weight: 800; border: 3px solid;
-  transition: all 0.3s; flex-shrink: 0;
+input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,220,255,0.1);}
+input[type=text]::placeholder{color:rgba(232,244,248,0.25);}
+
+.btn-primary{
+  width:100%;padding:16px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--accent),rgba(0,220,255,0.7));
+  color:#060a12;font-size:1rem;font-weight:800;
+  cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;
+  letter-spacing:0.3px;
 }
-.tok { border-color: #34d399; color: #34d399; }
-.twarn { border-color: #fbbf24; color: #fbbf24; }
-.tdanger { border-color: #f87171; color: #f87171; animation: tpulse 0.5s ease infinite alternate; }
-@keyframes tpulse { from { transform: scale(1); } to { transform: scale(1.1); } }
-.q-text { font-size: 1.04rem; font-weight: 600; line-height: 1.65; margin-bottom: 20px; color: rgba(255,255,255,0.95); }
-.options { display: flex; flex-direction: column; gap: 10px; }
-.option {
-  display: flex; align-items: flex-start; gap: 13px;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.11);
-  border-radius: 13px; padding: 13px 15px;
-  cursor: pointer; transition: all 0.17s;
-  font-size: 0.93rem; line-height: 1.5;
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,220,255,0.3);}
+
+/* chapter select */
+.section-label{
+  font-family:'Space Mono',monospace;font-size:0.7rem;
+  color:var(--accent);letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:16px;
 }
-.option:hover:not(.locked) { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.4); }
-.option.sel { background: rgba(245,166,35,0.16); border-color: rgba(245,166,35,0.6); }
-.option.cor { background: rgba(52,211,153,0.15); border-color: #34d399; }
-.option.wrg { background: rgba(248,113,113,0.15); border-color: #f87171; }
-.opt-letter {
-  min-width: 28px; height: 28px; border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 0.78rem; flex-shrink: 0; color: rgba(255,255,255,0.65);
+h2{font-size:1.5rem;font-weight:800;margin-bottom:6px;}
+.ch-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.ch-card{
+  border:1.5px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:18px 20px;
+  cursor:pointer;transition:all 0.2s;
+  display:grid;grid-template-columns:auto 1fr auto;
+  align-items:center;gap:14px;
+  background:rgba(255,255,255,0.025);
 }
-.option.cor .opt-letter { background: #34d399; color: #022c22; }
-.option.wrg .opt-letter { background: #f87171; color: #2c0000; }
-.option.sel:not(.cor):not(.wrg) .opt-letter { background: rgba(245,166,35,0.55); color: #1a0a00; }
-.fb {
-  margin-top: 14px; padding: 14px 16px;
-  border-radius: 14px; font-size: 0.87rem; line-height: 1.65;
-  animation: slideUp 0.3s ease;
+.ch-card:hover:not(.wip){background:rgba(0,220,255,0.06);border-color:rgba(0,220,255,0.3);}
+.ch-card.wip{opacity:0.5;cursor:not-allowed;}
+.ch-card.selected{background:rgba(0,220,255,0.09);border-color:rgba(0,220,255,0.5);}
+.ch-num{
+  font-family:'Space Mono',monospace;font-size:1.6rem;font-weight:700;
+  color:rgba(0,220,255,0.3);width:36px;text-align:center;
 }
-@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.fb-ok { background: rgba(52,211,153,0.11); border: 1px solid rgba(52,211,153,0.32); color: #6ee7b7; }
-.fb-no { background: rgba(248,113,113,0.11); border: 1px solid rgba(248,113,113,0.32); color: #fca5a5; }
-.next-btn {
-  margin-top: 18px; padding: 14px; border-radius: 14px; border: none;
-  color: #1a0a00; font-size: 1rem; font-weight: 700;
-  cursor: pointer; width: 100%; transition: all 0.2s;
+.ch-card.selected .ch-num{color:var(--accent);}
+.ch-info h3{font-size:0.95rem;font-weight:700;margin-bottom:3px;}
+.ch-info p{font-size:0.78rem;color:var(--muted);line-height:1.4;}
+.wip-badge{
+  font-size:0.68rem;font-weight:700;font-family:'Space Mono',monospace;
+  padding:4px 10px;border-radius:99px;
+  background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.3);
+  border:1px solid rgba(255,255,255,0.1);
 }
-.next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,166,35,0.35); }
-.score-big {
-  font-size: 5rem; font-weight: 900; text-align: center; margin: 12px 0 6px;
-  background: linear-gradient(135deg, #f5a623, #34d399);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+.ready-badge{
+  font-size:0.68rem;font-weight:700;font-family:'Space Mono',monospace;
+  padding:4px 10px;border-radius:99px;
+  background:rgba(168,255,62,0.1);color:var(--accent3);
+  border:1px solid rgba(168,255,62,0.25);
 }
-.score-lbl { text-align: center; color: rgba(255,255,255,0.52); margin-bottom: 20px; font-size: 0.94rem; }
-.grade-badge {
-  padding: 7px 22px; border-radius: 99px;
-  font-weight: 800; font-size: 1.05rem;
-  width: fit-content; margin: 0 auto 22px; display: block; text-align: center;
+
+/* type select */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+.type-card{
+  border:2px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:24px 20px;
+  cursor:pointer;transition:all 0.25s;
+  text-align:center;background:rgba(255,255,255,0.02);
 }
-.stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 22px; }
-.stat { background: rgba(255,255,255,0.07); border-radius: 14px; padding: 14px; text-align: center; }
-.stat .n { font-size: 1.7rem; font-weight: 800; }
-.stat .l { font-size: 0.74rem; color: rgba(255,255,255,0.48); margin-top: 3px; }
-.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.btn-sec {
-  padding: 13px; border-radius: 13px;
-  border: 1.5px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.06);
-  color: #fff; font-size: 0.92rem; font-weight: 700;
-  cursor: pointer; transition: all 0.2s;
+.type-card:hover{transform:translateY(-3px);}
+.type-card.theory-card:hover{border-color:rgba(0,220,255,0.5);background:rgba(0,220,255,0.07);}
+.type-card.calc-card:hover{border-color:rgba(255,107,53,0.5);background:rgba(255,107,53,0.07);}
+.type-icon{font-size:2.2rem;margin-bottom:10px;}
+.type-card h3{font-size:1rem;font-weight:800;margin-bottom:6px;}
+.type-card p{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.theory-card h3{color:var(--theory);}
+.calc-card h3{color:var(--calc);}
+.type-timer{
+  display:inline-block;margin-top:10px;
+  font-family:'Space Mono',monospace;font-size:0.72rem;
+  padding:3px 10px;border-radius:99px;
 }
-.btn-sec:hover { background: rgba(255,255,255,0.11); }
-.stag {
-  display: inline-block; font-size: 0.71rem; font-weight: 700;
-  padding: 3px 10px; border-radius: 99px;
-  margin-bottom: 10px; letter-spacing: 0.3px;
+.theory-timer{background:rgba(0,220,255,0.1);color:var(--theory);border:1px solid rgba(0,220,255,0.2);}
+.calc-timer{background:rgba(255,107,53,0.1);color:var(--calc);border:1px solid rgba(255,107,53,0.2);}
+
+/* quiz */
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:0.82rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.progress-bar{width:100%;height:4px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;margin-bottom:20px;}
+.progress-fill{height:100%;border-radius:99px;transition:width 0.4s ease;}
+.timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.q-tag{
+  font-family:'Space Mono',monospace;font-size:0.7rem;
+  padding:4px 12px;border-radius:99px;letter-spacing:1px;
 }
-.streak-txt { font-size: 0.82rem; }
-.advice { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 16px; margin-bottom: 20px; font-size: 0.86rem; color: rgba(255,255,255,0.62); line-height: 1.7; }
-@media (max-width: 520px) {
-  .card { padding: 22px 16px; }
-  h1 { font-size: 1.6rem; }
-  .stat-row { grid-template-columns: 1fr 1fr; }
-  .btn-row { grid-template-columns: 1fr; }
-  .score-big { font-size: 3.8rem; }
+.theory-tag{background:rgba(0,220,255,0.1);color:var(--theory);border:1px solid rgba(0,220,255,0.2);}
+.calc-tag{background:rgba(255,107,53,0.1);color:var(--calc);border:1px solid rgba(255,107,53,0.2);}
+.timer-ring{
+  width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;
+  border:2.5px solid;transition:all 0.3s;flex-shrink:0;
+}
+.tok{border-color:var(--accent3);color:var(--accent3);}
+.twarn{border-color:#fbbf24;color:#fbbf24;}
+.tdanger{border-color:#f87171;color:#f87171;animation:tpulse 0.5s ease infinite alternate;}
+@keyframes tpulse{from{transform:scale(1);}to{transform:scale(1.1);}}
+.q-text{
+  font-size:1rem;font-weight:600;line-height:1.75;
+  margin-bottom:22px;color:rgba(232,244,248,0.95);
+}
+.q-text sup,
+.q-text sub{font-size:0.75em;}
+.options{display:flex;flex-direction:column;gap:9px;}
+.option{
+  display:flex;align-items:flex-start;gap:12px;
+  background:rgba(255,255,255,0.035);
+  border:1.5px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:13px 15px;
+  cursor:pointer;transition:all 0.15s;
+  font-size:0.9rem;line-height:1.6;
+}
+.option:hover:not(.locked){background:rgba(0,220,255,0.06);border-color:rgba(0,220,255,0.3);}
+.option.sel{background:rgba(0,220,255,0.1);border-color:rgba(0,220,255,0.5);}
+.option.cor{background:rgba(168,255,62,0.1);border-color:var(--accent3);}
+.option.wrg{background:rgba(248,113,113,0.1);border-color:#f87171;}
+.opt-letter{
+  min-width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:0.75rem;flex-shrink:0;
+  font-family:'Space Mono',monospace;color:var(--muted);
+}
+.option.cor .opt-letter{background:var(--accent3);color:#060a12;}
+.option.wrg .opt-letter{background:#f87171;color:#060a12;}
+.option.sel:not(.cor):not(.wrg) .opt-letter{background:rgba(0,220,255,0.4);color:#060a12;}
+.fb{
+  margin-top:14px;padding:14px 16px;border-radius:12px;
+  font-size:0.86rem;line-height:1.7;
+  animation:slideUp 0.3s ease;font-family:'Space Mono',monospace;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fb-ok{background:rgba(168,255,62,0.07);border:1px solid rgba(168,255,62,0.25);color:#a8ff3e;}
+.fb-no{background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.25);color:#fca5a5;}
+.next-btn{
+  margin-top:18px;padding:14px;border-radius:12px;border:none;
+  color:#060a12;font-size:0.95rem;font-weight:800;
+  cursor:pointer;width:100%;transition:all 0.2s;font-family:'Syne',sans-serif;
+}
+.next-btn:hover{transform:translateY(-2px);}
+
+/* results */
+.score-big{
+  font-size:4.5rem;font-weight:900;text-align:center;margin:10px 0 4px;
+  font-family:'Space Mono',monospace;
+}
+.score-lbl{text-align:center;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:20px;font-size:0.85rem;}
+.grade-badge{
+  padding:8px 24px;border-radius:99px;font-weight:800;
+  font-size:0.95rem;width:fit-content;margin:0 auto 24px;display:block;text-align:center;
+}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+.stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px;text-align:center;}
+.stat .n{font-size:1.8rem;font-weight:800;font-family:'Space Mono',monospace;}
+.stat .l{font-size:0.72rem;color:var(--muted);margin-top:3px;font-family:'Space Mono',monospace;}
+.advice{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;margin-bottom:20px;font-size:0.84rem;color:var(--muted);line-height:1.75;font-family:'Space Mono',monospace;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.btn-sec{
+  padding:13px;border-radius:12px;
+  border:1.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.04);
+  color:var(--text);font-size:0.88rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;
+}
+.btn-sec:hover{background:rgba(255,255,255,0.08);}
+.streak-info{font-size:0.8rem;font-family:'Space Mono',monospace;}
+
+/* WIP overlay */
+.wip-screen{text-align:center;padding:20px 0;}
+.wip-icon{font-size:4rem;margin-bottom:16px;}
+.wip-title{font-size:1.8rem;font-weight:900;margin-bottom:8px;}
+.wip-sub{font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:28px;font-family:'Space Mono',monospace;}
+
+@media(max-width:520px){
+  .card{padding:22px 16px;}
+  h1{font-size:1.8rem;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .btn-row{grid-template-columns:1fr;}
+  .score-big{font-size:3.2rem;}
+  .type-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -181,211 +265,205 @@ input[type=text]:focus { border-color: rgba(245,166,35,0.7); box-shadow: 0 0 0 3
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
-const GSURL = "https://script.google.com/macros/s/AKfycbzQ49ebOvpIuttMBXh7gkCRU857mK6T0Hr3v4yiEisPzHjwHdaPFyD744kWGVu81KymqA/exec";
 
-const S1 = [
-  {sec:"Analytical Overview",q:"Efua Sutherland's primary aim in 'The Marriage of Anansewa' is to critique which condition?",o:["The decline of traditional Ghanaian theatre","The condition of greed in modern relationships","The lack of educational curricula for children","The death of indigenous publishing companies"],c:1,n:"The play depicts how greed has conditioned love and marriage institutions."},
-  {sec:"Analytical Overview",q:"In the plot's exposition, Ananse's extortion plan is specifically triggered by:",o:["His desire for a new car","Anansewa's outstanding school fees","The visit of his mother Aya","A request for marriage from Togbe Klu IV"],c:1,n:"He plans to extort money to pay fees and gain wealth."},
-  {sec:"Analytical Overview",q:"The 'falling action' of the play is defined by which specific event?",o:["Anansewa waking from her feigned death","The arrival of Chief-Who-Is-Chief's funeral items","The performance of the ritual of love incantations","Ananse realising he has sent too many letters"],c:1,n:"This moment allows Ananse to conclude who the truly loving husband is."},
-  {sec:"Analytical Overview",q:"Which character represents the gap between modern sophistication and emotional dependence?",o:["Anansewa","Ekuwa","Christie","Aya"],c:2,n:"Christie's outward modernity contrasts with her desperate pursuit of male approval."},
-  {sec:"Analytical Overview",q:"Anansewa's character is described as a 'dramatic device' primarily to interrogate:",o:["The beauty of traditional marriage rites","The marginalisation of women's voices","The efficiency of secretarial training","The cunning nature of the spider-man"],c:1,n:"She serves to interrogate patriarchal control and female silence."},
-  {sec:"Stagecraft & Devices",q:"The use of a web-shaped screen on stage is a symbolic device representing:",o:["The interconnectedness of Ghanaian tribes","Ananse's entrapment of others through schemes","The complexity of modern educational systems","The ancestral protection of the Nsona clan"],c:1,n:"It externalizes his scheming and manipulative strategies."},
-  {sec:"Stagecraft & Devices",q:"What is the function of 'Mboguo' within the dramatic structure?",o:["To manage and distribute stage props","To provide a religious atmosphere through mime","To serve as musical interludes that advance the plot","To deliver letters to the four different chiefs"],c:2,n:"These interludes heighten entertainment and reveal vital information."},
-  {sec:"Stagecraft & Devices",q:"'Selective Modernity' is best exemplified by Ananse's desire to:",o:["Buy a typewriter for his daughter","Renovate his house while following customary rites","Send his daughter to a secretarial school","Use a telephone to contact the Mines"],c:1,n:"He pursues modern comfort while relying on tradition for personal gain."},
-  {sec:"Stagecraft & Devices",q:"The 'Property Man' on stage contributes to the play's realism by:",o:["Acting as the primary storyteller","Manning a property stand and distributing props on cue","Portraying the four chiefs in various scenes","Leading the audience in collective singing"],c:1,n:"He manages props and supports smooth scene transitions."},
-  {sec:"Stagecraft & Devices",q:"Dramatic irony is effectively used in Act Two when:",o:["Anansewa pretends to be dead in front of the messengers","The Postman fails to recognise Ananse as the recipient","Christie reflects on Ananse's silence in a soliloquy","Aya and Ekuwa leave for Nanka to fight enemies"],c:1,n:"The audience knows Ananse's identity, but the Postman does not."},
-  {sec:"Themes & Characters",q:"The theme of 'Female Education' is articulated as 'social capital' through:",o:["Ananse's insistence on the typewriter","Chief-Who-Is-Chief's preference for an educated wife","Christie's role as a fashionable modern woman","Anansewa's ability to write shorthand"],c:1,n:"Education is seen as a criterion of worth for social order and partnership."},
-  {sec:"Themes & Characters",q:"In the analytical framework, the 'climax' of the play is identified as:",o:["When Anansewa is resurrected from death","When the four chiefs all announce they are coming","When Ananse realises the Mines Chief is wealthy","When the letters are posted at the Post Office"],c:1,n:"The arrival of messengers from all four chiefs creates the central chaos."},
-  {sec:"Themes & Characters",q:"Which minor character reflects the collective participation of women in traditional practices?",o:["Christie","Ekuwa","The Postman","The Storyteller"],c:1,n:"As Ananse's aunt, she assists in marriage preparations and rituals."},
-  {sec:"Stagecraft & Devices",q:"The technique of 'Mime' is specifically used to represent which scene?",o:["The writing of the four letters","The church scene and the inviting of witnesses","The battle at the cocoa farm in Nanka","The meeting between Ananse and Chief-Who-Is-Chief"],c:1,n:"Meaning is communicated through physical action rather than dialogue here."},
-  {sec:"The Storyteller",q:"Which phrase describes the Storyteller's relationship to the audience in Anansegoro?",o:["A detached observer","The owner of the story with a right to know everything","A silent director behind the scenes","A character trapped in Ananse's web"],c:1,n:"The narrator is seen as the owner of the story and is personally involved."},
-  {sec:"Themes & Characters",q:"Anansewa's song in Act 1 serves as a vehicle for:",o:["Her acceptance of the marriage proposals","Her open resistance to being sold like a parcel","Her appreciation for her new typewriter","Her desire to marry Chief-Who-Is-Chief"],c:1,n:"Music is used here to reveal her resistance to her father's intentions."},
-  {sec:"The Storyteller",q:"What does the term 'Anansegoro' refer to?",o:["The traditional body of Ananse folktales","A system of traditional theatre combining narration and action","The specific name of Ananse's ancestral clan","The act of paying a head-drink for a bride"],c:1,n:"It is the developed classification of traditional theatre used in the play."},
-  {sec:"Stagecraft & Devices",q:"The 'Flashback' technique is used in the play to clarify:",o:["The death of Anansewa's mother","Ananse's insistence on the taking of photographs","The childhood of Chief-Who-Is-Chief","How Christie and Ananse first met"],c:1,n:"It revives past experiences to explain Ananse's current schemes."},
-  {sec:"Themes & Characters",q:"Ananse's 'materialistic approach' to marriage is most directly contrasted with:",o:["Christie's fashionable appearance","Chief-Who-Is-Chief's progressive understanding","Aya's traditional family values","The Mines Chief's extravagance"],c:1,n:"One sees marriage as possession, the other as partnership."},
-  {sec:"Themes & Characters",q:"The 'Messengers' advance the plot by acting as:",o:["Comedians who distract the audience","Emissaries who make the chiefs' presence felt","Witnesses to Ananse's ritual of love","Teachers at Anansewa's secretarial school"],c:1,n:"They convey intentions and heighten tension without the chiefs appearing."},
-  {sec:"Themes & Characters",q:"Which theme suggests that marriage negotiations are economic metaphors?",o:["Selective Modernity","Cultural Continuity","Female Commodification","Greed"],c:2,n:"Marriage negotiations function as a metaphor for market exchange."},
-  {sec:"Stagecraft & Devices",q:"The 'Soliloquy' in Act 3 provides insight into:",o:["Ananse's fear of the four chiefs","Christie's emotional state regarding Ananse","Anansewa's love for her father","Aya's anger at the cocoa farm fire"],c:1,n:"Christie reflects on Ananse's silence and his obliviousness to her."},
-  {sec:"Stagecraft & Devices",q:"Audience participation in the play is achieved through:",o:["Allowing spectators to vote on the best suitor","Collective singing and clapping","Inviting the audience to help Ananse type letters","Asking the audience to pay Anansewa's fees"],c:1,n:"This transforms spectators into co-performers."},
-  {sec:"Themes & Characters",q:"Ananse's cunning nature is described as coming out specifically in times of:",o:["Great wealth and prosperity","Need and desperation","Religious devotion and prayer","Joy and family celebrations"],c:1,n:"His craftiness reflects how man reacts to desperation."},
-  {sec:"Themes & Characters",q:"The resolution of the play is termed a 'ritual of love' because:",o:["It involves the actual burial of Anansewa","Love is credited with resurrecting Anansewa","The four chiefs finally agree to share Anansewa","Ananse gives up all his wealth for his daughter"],c:1,n:"Anansewa is 'resurrected' from her fake death because of love."},
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const CH1_THEORY = [
+  {part:"Atomic Theory & Energy Bands",q:"At absolute zero temperature (0 K), what is the state of a pure silicon crystal regarding electrical conduction?",o:["High conductivity due to packed valence electrons","Zero conductivity because all covalent bonds are intact","Moderate conductivity due to the narrow 1.1 eV gap","Superconductivity because of the lack of lattice vibration"],c:1,n:"At 0 K, all electrons are bound in covalent bonds (valence band), leaving no free electrons available for conduction."},
+  {part:"Atomic Theory & Energy Bands",q:"Which statement accurately describes the 'valence orbit' in the basic atomic model?",o:["It is the orbit closest to the nucleus with the lowest energy","It is any orbit containing exactly eight electrons","It is the outermost orbit of an atom","It is the forbidden region between energy levels"],c:2,n:"The outermost orbit is defined as the valence orbit, and its electrons participate in chemical bonding."},
+  {part:"Atomic Theory & Energy Bands",q:"What is the defined energy required to decrease an electron's potential by 1 Volt?",o:["1.602 × 10⁻¹⁹ Joules","1.1 Electron Volts","0.76 Electron Volts","1.0 Joule per Coulomb"],c:0,n:"1 eV is defined as the energy needed to change potential by 1 V, which equals 1.602 × 10⁻¹⁹ Joules."},
+  {part:"Atomic Theory & Energy Bands",q:"Silicon and Germanium are referred to as 'tetravalent' because they have:",o:["Four distinct energy shells in their atomic structure","Four protons more than their nearest noble gas","Four electrons in their outermost orbit","Four isotopes commonly found in nature"],c:2,n:"Tetravalent atoms specifically have four valence band electrons."},
+  {part:"Atomic Theory & Energy Bands",q:"In an energy-band diagram, where are the electrons that contribute to electric current located?",o:["The forbidden band","The valence band","The conduction band","The Fermi level"],c:2,n:"Once liberated from bonds, electrons enter the conduction band where they move and contribute to current."},
+  {part:"Atomic Theory & Energy Bands",q:"Which material property allows electrons to jump to the conduction band solely through thermal excitation at room temperature?",o:["Large energy gap (> 5 eV)","Moderate energy gap (~ 1 eV)","Non-existent energy gap","Negative potential barrier"],c:2,n:"Conductors (metals) have very small or non-existent gaps, allowing easy thermal excitation into the conduction band."},
+  {part:"Atomic Theory & Energy Bands",q:"Silicon has a bandgap energy of approximately 1.1 eV. What is the corresponding value for Germanium?",o:["1.21 eV","0.30 eV","0.76 eV","0.045 eV"],c:2,n:"While silicon is roughly 1.1–1.2 eV, germanium's energy gap is specifically 0.76 eV."},
+  {part:"Atomic Theory & Energy Bands",q:"What happens to the resistance of an intrinsic semiconductor as its temperature increases?",o:["It increases linearly","It remains constant","It decreases","It drops to zero instantly"],c:2,n:"Higher temperatures create more electron-hole pairs, facilitating easier current flow (negative temperature coefficient)."},
+  {part:"Atomic Theory & Energy Bands",q:"The 'Forbidden Band' is a region where:",o:["Only holes are allowed to exist","Electrons are trapped in covalent bonds","No allowed energy states exist for electrons","Only donor impurities can reside"],c:2,n:"The band gap (forbidden band) is a range of energy levels with no allowed states for an electron."},
+  {part:"Atomic Theory & Energy Bands",q:"What is the 'Generation Rate' in a semiconductor?",o:["The speed of battery-induced current","The speed of free electron and hole creation","The rate of impurity atom evaporation","The frequency of lattice vibrations"],c:1,n:"Generation is the process where free electrons and holes are created; the rate is the speed of this process."},
+  {part:"Doping & Extrinsic Semiconductors",q:"To create an n-type semiconductor, which group of elements is used for doping?",o:["Group III (Trivalent)","Group IV (Tetravalent)","Group V (Pentavalent)","Group VI (Hexavalent)"],c:2,n:"Pentavalent atoms (like Phosphorus) have an extra electron to donate, creating n-type material."},
+  {part:"Doping & Extrinsic Semiconductors",q:"What is the specific energy level (E_D) of donor electrons in Phosphorus-doped silicon relative to the conduction band (E_C)?",o:["0.76 eV below E_C","0.045 eV below E_C","0.044 eV above E_V","1.12 eV above E_V"],c:1,n:"In n-type silicon, E_D is very close to E_C, typically about 0.045 eV."},
+  {part:"Doping & Extrinsic Semiconductors",q:"Which of the following is a Trivalent (Group III) impurity?",o:["Arsenic","Antimony","Boron","Phosphorus"],c:2,n:"Boron, Aluminum, Gallium, and Indium are common trivalent (acceptor) impurities."},
+  {part:"Doping & Extrinsic Semiconductors",q:"In a p-type semiconductor, what constitutes the 'Minority Carriers'?",o:["Holes","Trivalent atoms","Free electrons","Acceptor ions"],c:2,n:"In p-type material, holes are the majority; free electrons (thermally generated) are the minority."},
+  {part:"Doping & Extrinsic Semiconductors",q:"What is the fundamental relationship between electron density (n) and hole density (p) in any semiconductor at equilibrium?",o:["n + p = nᵢ","n × p = nᵢ²","n / p = nᵢ","n² × p² = nᵢ"],c:1,n:"The product of electron and hole concentrations always equals the square of the intrinsic concentration."},
+  {part:"Doping & Extrinsic Semiconductors",q:"Why is a doped semiconductor still considered 'charge neutral'?",o:["It contains equal numbers of free electrons and holes","The number of protons equals the total number of electrons","The impurities are non-conductive","The donor ions cancel the acceptor ions"],c:1,n:"Although there are more free carriers, the total number of protons in the nuclei still balances the total number of electrons."},
+  {part:"Doping & Extrinsic Semiconductors",q:"What determines the 'Majority Carrier' concentration in a doped semiconductor at normal temperatures?",o:["Thermal generation rate","Ambient light intensity","Impurity concentration","The recombination rate"],c:2,n:"Majority carriers are determined by the dopant level and are largely independent of temperature unless it is very high."},
+  {part:"Doping & Extrinsic Semiconductors",q:"If the temperature of a doped semiconductor becomes extremely high, what happens to its characteristics?",o:["It becomes a perfect insulator","It behaves like an intrinsic semiconductor","Its majority carriers double","It loses all impurity ions"],c:1,n:"At very high temperatures, thermal generation of nᵢ overwhelms the doping concentration, making it behave like intrinsic material."},
+  {part:"Doping & Extrinsic Semiconductors",q:"How much energy (E_A) is typically required to move a valence electron into a Boron acceptor site?",o:["0.044 eV","0.045 eV","1.10 eV","0.70 eV"],c:0,n:"For Boron-doped p-type silicon, the energy E_A is approximately 0.044 eV above the valence band."},
+  {part:"Doping & Extrinsic Semiconductors",q:"Typical dopant levels in silicon are approximately how many atoms per cm³?",o:["5 × 10²²","10¹⁵","10⁻⁸","10⁴"],c:1,n:"While silicon has ~5 × 10²² atoms/cm³, only ~10¹⁵ dopant atoms/cm³ are needed for conduction."},
+  {part:"PN Junction & Biasing",q:"What process occurs first when a P-type and N-type material are brought together?",o:["Avalanche breakdown","Majority carrier diffusion","Minority carrier drift","Zener emission"],c:1,n:"The process begins with majority carriers (holes and electrons) diffusing across the boundary."},
+  {part:"PN Junction & Biasing",q:"The 'Depletion Region' is so named because it is depleted of:",o:["All atomic nuclei","Trivalent and Pentavalent ions","Mobile charge carriers","Covalent bonds"],c:2,n:"This region is cleared of free electrons and holes due to recombination near the junction."},
+  {part:"PN Junction & Biasing",q:"What is the direction of the 'Diffusion Current' in a PN junction?",o:["N-side to P-side","P-side to N-side","Circularly around the junction","It has no specific direction"],c:1,n:"Holes diffuse from P to N, and electrons diffuse from N to P; by convention, the total diffusion current is P to N."},
+  {part:"PN Junction & Biasing",q:"Under 'Open-Circuit' equilibrium, what is the relationship between diffusion current (I_D) and drift current (I_S)?",o:["I_D > I_S","I_D < I_S","I_D = I_S","I_D + I_S = 0.7 A"],c:2,n:"In equilibrium with no external voltage, the two opposite currents must be equal in magnitude."},
+  {part:"PN Junction & Biasing",q:"What causes the 'Potential Barrier' (V_O) at the junction?",o:["The resistance of the silicon","Uncovered positive and negative ions","The external battery voltage","Excessive thermal vibration"],c:1,n:"As electrons and holes diffuse, they leave behind uncovered donor (+ve) and acceptor (-ve) ions, creating a field."},
+  {part:"PN Junction & Biasing",q:"In 'Forward Bias,' the positive terminal of the source is connected to:",o:["The N-type material","The P-type material","The depletion region directly","The ground terminal only"],c:1,n:"Forward bias connects P to positive and N to negative."},
+  {part:"PN Junction & Biasing",q:"What happens to the depletion region width during 'Reverse Bias'?",o:["It narrows significantly","It remains completely unchanged","It widens","It disappears entirely"],c:2,n:"Reverse bias pulls free carriers away from the junction, increasing the width of the depletion zone."},
+  {part:"PN Junction & Biasing",q:"Which condition is required for current to flow in a forward-biased PN junction?",o:["The voltage must be exactly 0 V","The voltage must be negative","The voltage must exceed a threshold","The device must be at 0 K"],c:2,n:"A threshold voltage (e.g., ~0.7 V for Si) must be reached to collapse the depletion region and allow current."},
+  {part:"PN Junction & Biasing",q:"The 'Built-in Electric Field' in a PN junction points in which direction?",o:["From P-region to N-region","From N-region to P-region","Parallel to the junction surface","It alternates with temperature"],c:1,n:"The uncovered positive ions are on the N-side and negative ions are on the P-side, directing the field from N to P."},
+  {part:"PN Junction & Biasing",q:"What is the typical barrier potential (V_O) for a silicon PN junction at room temperature?",o:["0.1 to 0.3 V","0.6 to 0.8 V","1.1 to 1.2 V","5.0 to 7.0 V"],c:1,n:"Silicon's barrier voltage at room temperature is specifically listed as 0.6–0.8 V."},
+  {part:"Breakdown & I-V Characteristics",q:"'Zener Breakdown' is primarily caused by:",o:["Impact ionization from collisions","A very strong electric field","High thermal generation rates","Excessive forward biasing"],c:1,n:"Zener breakdown occurs when a high field exerts enough force to pull electrons directly from covalent bonds."},
+  {part:"Breakdown & I-V Characteristics",q:"Which mechanism involves a 'chain reaction' of collisions?",o:["Zener breakdown","Diffusion","Avalanche breakdown","Thermal recombination"],c:2,n:"Avalanche multiplication occurs when accelerated carriers collide with atoms, freeing more carriers in a chain reaction."},
+  {part:"Breakdown & I-V Characteristics",q:"Zener effect typically occurs if the breakdown voltage (V_Z) is:",o:["Greater than 7 V","Exactly 0.7 V","Less than 5 V","Between 5 V and 7 V"],c:2,n:"Zener breakdown is the dominant mechanism when V_Z is below 5 V."},
+  {part:"Breakdown & I-V Characteristics",q:"What happens to the 'Reverse Current' before the breakdown voltage is reached?",o:["It increases linearly with voltage","It is zero in all conditions","It is a small, constant value","It exceeds the forward current"],c:2,n:"This is the leakage current (saturation current), which is very small and nearly independent of voltage until breakdown."},
+  {part:"Breakdown & I-V Characteristics",q:"'Impact Ionization' is another term associated with:",o:["Forward bias diffusion","Avalanche breakdown","P-type doping","Atomic covalent bonding"],c:1,n:"Impact ionization refers to carriers acquiring enough energy to knock valence electrons free during collisions."},
+  {part:"Breakdown & I-V Characteristics",q:"In equilibrium, the 'Fermi Level' in a PN junction is:",o:["Higher on the P-side","Higher on the N-side","Constant throughout the system","Discontinuous at the junction"],c:2,n:"In thermodynamic equilibrium with no external potential, the Fermi energy has the same value everywhere."},
+  {part:"Breakdown & I-V Characteristics",q:"When a PN junction is 'Reverse Biased,' the junction potential increases to:",o:["|V_O| − |V_ext|","|V_ext|","|V_O| + |V_ext|","0 V"],c:2,n:"The external potential aids the built-in barrier, increasing the total potential magnitude."},
+  {part:"Breakdown & I-V Characteristics",q:"Which breakdown mechanism is most likely in a 'low-doped' semiconductor?",o:["Zener","Avalanche","Thermal","Covalent"],c:1,n:"Avalanche breakdown is the standard mechanism in more lightly doped junctions."},
+  {part:"Breakdown & I-V Characteristics",q:"If the drift current (I_S) exceeds the diffusion current (I_D), the depletion layer will:",o:["Widen","Stay the same","Narrow","Break down"],c:2,n:"If I_S > I_D, uncovered charge decreases, narrowing the layer until equilibrium (I_D = I_S) is restored."},
+  {part:"Breakdown & I-V Characteristics",q:"The resistivity of a typical semiconductor is approximately:",o:["10⁻⁸ Ωm","10⁻¹ Ωm","10⁴ Ωm","10¹⁰ Ωm"],c:1,n:"Conductors are ~10⁻⁸, insulators are ~10⁴+, and semiconductors are intermediate at ~10⁻¹ Ωm."},
 ];
 
-const S2 = [
-  {sec:"Analytical Pt. 2",q:"What is the 'Okyame' in the context of the Storyteller's staff?",o:["A sacred religious artifact","A Chief's official spokesman","A prop used to trap spiders","A symbol of Ananse's poverty"],c:1,n:"The storyteller's staff is an imitation of this official role."},
-  {sec:"Analytical Pt. 2",q:"'Anansesem' is distinguished from 'Anansegoro' by being:",o:["A modern musical drama","A traditional story-telling art of the Akan people","A specific type of funeral dirge","The name of the secretarial school"],c:1,n:"It refers to the body of stories and the performance itself."},
-  {sec:"Analytical Pt. 2",q:"Ananse's character represents 'Everyman' to serve as a medium for:",o:["Entertainment alone","Society to criticise itself","Religious instruction","Promoting foreign cultures"],c:1,n:"He mirrors human follies for societal self-examination."},
-  {sec:"Analytical Pt. 2",q:"The expression 'Ananse's wealth!' is described in the Foreword as:",o:["A compliment for his hard work","A sarcastic expression for temporary success","A literal description of his bank account","A curse from the four chiefs"],c:1,n:"It refers to triumphs that are not likely to last."},
-  {sec:"Analytical Pt. 2",q:"According to the analytical framework, Ananse's greed eventually leads to:",o:["Eternal fame","A moral decay and personal downfall","The successful marriage of his daughter to four men","The renovation of the entire town of Sapaase"],c:1,n:"Excessive desire for wealth causes this decay."},
-  {sec:"Analytical Pt. 2",q:"The 'Post Office Crew' are categorised in the cast as:",o:["Main characters","Minor characters played by the pool of Players","Messengers from the Chief-Who-Is-Chief","Relatives of Christie"],c:1,n:"They are part of the participating audience/players."},
-  {sec:"Analytical Pt. 2",q:"Aya embodies which archetype in her domestic role?",o:["The cunning trickster","The fashionable modern woman","The affectionate, nurturing grandmother","The greedy business partner"],c:2,n:"She provides emotional support and traditional values."},
-  {sec:"Analytical Pt. 2",q:"The 'climax' begins specifically when the four chiefs:",o:["Refuse to pay any more money","Show interest and send messengers simultaneously","Discover that Anansewa is still alive","Threaten to arrest Ananse for fraud"],c:1,n:"The simultaneous interest creates the chaos leading to the fake death."},
-  {sec:"Analytical Pt. 2",q:"The 'falling action' depicts Chief-Who-Is-Chief as:",o:["The wealthiest and most arrogant","The only suitor with good and loving intentions","A man who refuses to help with the funeral","A suitor who was easily deceived by Ananse"],c:1,n:"He is the only one who sends items for the burial."},
-  {sec:"Analytical Pt. 2",q:"The 'Property Man' can also function as a:",o:["Lead singer in the Mboguo","Prompter for the actors","Judge in the final scene","Suitor for Anansewa"],c:1,n:"He is available as an actor and prompter."},
-  {sec:"Analytical Pt. 2",q:"Anansewa's 'seeming passivity' should be read as:",o:["True intellectual weakness","A reflection of limited socio-cultural options","A desire to avoid secretarial training","Fear of the Chief of the Mines"],c:1,n:"It reflects her context rather than personal character."},
-  {sec:"Analytical Pt. 2",q:"Christie's pursuit of Ananse exposes a gap between:",o:["Traditional and modern education","Appearance and reality","Wealth and poverty","Youth and old age"],c:1,n:"Her sophisticated image contrasts with her behaviour."},
-  {sec:"Analytical Pt. 2",q:"The Storyteller has a conventional right to:",o:["Marry Anansewa himself","Know everything and be personally involved","Dismiss the Property Man at any time","Change the script of the play mid-performance"],c:1,n:"He is seen as the 'owner' of the story."},
-  {sec:"Analytical Pt. 2",q:"Mboguo can be used to acquaint the audience with:",o:["The price of the typewriter","Shifts of time or place","The name of the author","The correct way to type a letter"],c:1,n:"It helps develop action and characterisation."},
-  {sec:"Analytical Pt. 2",q:"The phrase 'Exterminate Ananse, and society will be ruined' means:",o:["Ananse is a hero who must be protected","He is a necessary artistic medium for self-criticism","Spiders are essential to the Ghanaian ecosystem","Deceit is the only way for society to function"],c:1,n:"He is essential for society to criticise itself."},
-  {sec:"Analytical Pt. 2",q:"What does the 'Okyame' staff symbolise for the Storyteller?",o:["Authority in the traditional performance","A weapon for self-defense","A tool for the Property Man","A gift from the Chief of Akate"],c:0,n:"It is an adaptation of the Chief's spokesman's staff."},
-  {sec:"Analytical Pt. 2",q:"The use of 'Letters' in Act 1 is a narrative device that:",o:["Delays the marriage plot indefinitely","Initiates the plot and enables simultaneous manipulation","Proves Anansewa is the best typist in Ghana","Warns the chiefs about Ananse's greed"],c:1,n:"It initiates the plot and creates tension."},
-  {sec:"Analytical Pt. 2",q:"In Act 2, the 'Postman' encounters Ananse but:",o:["Delivers a letter to Christie instead","Fails to recognise him as the intended recipient","Asks for a bribe to deliver the telegram","Tells him the Chief of Sapaase is dead"],c:1,n:"This gap in knowledge creates dramatic irony."},
-  {sec:"Analytical Pt. 2",q:"The 'Spider's Web' device signals Ananse's withdrawal for:",o:["Sleep and relaxation","Concealment and strategic reassessment","Traditional prayer and fasting","Counting the money he has extorted"],c:1,n:"He retreats behind the web during failures for reassessment."},
-  {sec:"Analytical Pt. 2",q:"Which theme highlights the priority of wealth over human relationships?",o:["Female Education","Selective Modernity","Greed","Cultural Continuity"],c:2,n:"Ananse's schemes put Anansewa at emotional risk."},
-  {sec:"Analytical Pt. 2",q:"The Storyteller describes Ananse's successes as:",o:["Permanent and glorious","Doubtful and temporary","The result of pure honesty","Recognised by all characters in the play"],c:1,n:"His schemes usually ruin him and end in impoverishment."},
-  {sec:"Analytical Pt. 2",q:"The 'Mime' technique in the church scene communicates meaning through:",o:["Secretarial shorthand","Physical action rather than spoken dialogue","Choral singing in the background","The use of a glass coffin"],c:1,n:"It communicates entirely through action."},
-  {sec:"Analytical Pt. 2",q:"Anansewa's dependence is reinforced when Ananse threatens to:",o:["Burn her typewriter","Withdraw financial support for her education","Marry Christie himself","Send her to the Chief of the Mines"],c:1,n:"This coercion emphasises the vulnerability of women."},
-  {sec:"Analytical Pt. 2",q:"The play's structure ensures clarity by having the Storyteller:",o:["Write the script on a blackboard","Guide the audience's understanding of events","Play the role of Anansewa","Remain silent throughout Act 4"],c:1,n:"He ensures clarity and guides the storyline."},
-  {sec:"Analytical Pt. 2",q:"What role does Efua Sutherland play in modern Ghanaian theatre?",o:["She was a minor playwright with little influence","She was a key figure who founded the Ghana Drama Studio","She primarily focused on film acting","She was the first woman to marry a chief in Ghana"],c:1,n:"She founded the Society of Writers, Drama Studio, and Experimental Theatre."},
+const CH1_CALC = [
+  {part:"Calculation",q:"For a photon to excite an electron from the valence band to the conduction band in silicon at room temperature, what is the minimum energy it must possess in Joules?",o:["1.602 × 10⁻¹⁹ J","1.762 × 10⁻¹⁹ J","1.217 × 10⁻¹⁹ J","1.100 × 10⁻¹⁹ J"],c:1,n:"E = 1.1 eV × (1.602 × 10⁻¹⁹ J/eV) = 1.7622 × 10⁻¹⁹ J. The silicon bandgap of 1.1 eV is converted using the eV-to-Joule conversion factor."},
+  {part:"Calculation",q:"Intrinsic silicon at 300 K has nᵢ = 1.5 × 10¹⁰ cm⁻³. Doped with N_D = 5 × 10¹⁵ atoms/cm³ phosphorus. What is the resulting hole concentration (p)?",o:["3.0 × 10⁵ cm⁻³","4.5 × 10⁴ cm⁻³","7.5 × 10²⁵ cm⁻³","2.25 × 10⁴ cm⁻³"],c:1,n:"Using the Mass Action Law: p = nᵢ²/N_D = (1.5×10¹⁰)²/(5×10¹⁵) = 2.25×10²⁰/5×10¹⁵ = 4.5×10⁴ cm⁻³."},
+  {part:"Calculation",q:"Calculate the built-in barrier voltage V₀ for a silicon PN junction at 300 K with N_A = 2×10¹⁷ cm⁻³, N_D = 4.5×10¹⁵ cm⁻³. (V_T = 26 mV, nᵢ = 1.5×10¹⁰ cm⁻³)",o:["0.621 V","0.814 V","0.738 V","0.545 V"],c:2,n:"V₀ = V_T × ln(N_A·N_D/nᵢ²) = 0.026 × ln[(2×10¹⁷ × 4.5×10¹⁵)/(1.5×10¹⁰)²] = 0.026 × ln(4×10¹²) = 0.026 × 28.38 ≈ 0.738 V."},
+  {part:"Calculation",q:"If silicon temperature increases from 300 K (nᵢ = 1.5×10¹⁰ cm⁻³) to 600 K (nᵢ = 1.54×10¹⁵ cm⁻³), by what approximate factor does nᵢ increase?",o:["2 times","1,000 times","100,000 times","10,000,000 times"],c:2,n:"Ratio = (1.54×10¹⁵)/(1.5×10¹⁰) ≈ 102,666 ≈ 10⁵ (100,000 times). This dramatic increase shows the strong temperature dependence of nᵢ."},
+  {part:"Calculation",q:"Pure silicon (5×10²² atoms/cm³) is doped with Boron at 2.5×10¹⁶ atoms/cm³. What is the ratio of silicon atoms to Boron atoms?",o:["1,250,000:1","2,000,000:1","500,000:1","200,000,000:1"],c:1,n:"Ratio = (5×10²²)/(2.5×10¹⁶) = 2×10⁶ = 2,000,000:1. This illustrates how sparsely dopant atoms are distributed in the crystal."},
+  {part:"Calculation",q:"Phosphorus has E_D located 0.045 eV below the conduction band. If kT at 300 K ≈ 0.0259 eV, what is the ratio of ionization energy to thermal energy?",o:["1.10","1.74","0.58","2.45"],c:1,n:"Ratio = 0.045 eV / 0.0259 eV ≈ 1.737 ≈ 1.74. This low ratio means only about 1.74× kT is needed to ionize a donor — explaining why doping is nearly complete at room temperature."},
+  {part:"Calculation",q:"A PN junction has V₀ = 0.75 V. An external reverse bias of V_ext = 12 V is applied. What is the new magnitude of the junction potential?",o:["11.25 V","0.75 V","12.00 V","12.75 V"],c:3,n:"In reverse bias, external potential aids the built-in barrier: Total = |V₀| + |V_ext| = 0.75 + 12 = 12.75 V."},
+  {part:"Calculation",q:"A P-type silicon sample at 300 K (nᵢ = 1.5×10¹⁰ cm⁻³) has hole concentration p = 10¹⁷ cm⁻³. What is the ratio of majority to minority carriers?",o:["4.44 × 10¹³ : 1","2.25 × 10³ : 1","6.67 × 10⁶ : 1","1.50 × 10¹⁰ : 1"],c:0,n:"Minority carriers n = nᵢ²/p = (2.25×10²⁰)/10¹⁷ = 2.25×10³ cm⁻³. Ratio = 10¹⁷/(2.25×10³) ≈ 4.44×10¹³ :1."},
+  {part:"Calculation",q:"Silicon doped with 10¹⁶ donors/cm³. At 600 K, nᵢ rises to 1.54×10¹⁵ cm⁻³. Calculate the minority carrier concentration.",o:["1.54 × 10¹⁵ cm⁻³","2.37 × 10¹⁴ cm⁻³","1.00 × 10¹⁶ cm⁻³","6.49 × 10¹⁴ cm⁻³"],c:1,n:"p = nᵢ²/N_D = (1.54×10¹⁵)²/10¹⁶ = 2.3716×10³⁰/10¹⁶ = 2.37×10¹⁴ cm⁻³. As nᵢ approaches N_D, the material begins acting intrinsic."},
+  {part:"Calculation",q:"A semiconductor cube of side length 2 cm (0.02 m) has resistivity 10⁻¹ Ωm. Using R = ρL/A, what is its resistance?",o:["5.0 Ω","0.2 Ω","1.0 Ω","0.5 Ω"],c:0,n:"R = ρ × L/A = 0.1 × (0.02)/(0.02 × 0.02) = 0.1 × 0.02/0.0004 = 0.002/0.0004 = 5.0 Ω."},
 ];
 
-const S3 = [
-  {sec:"The Script",q:"In the Foreword, what is the humorous story-telling term for being 'tricked'?",o:["Spun","Entrapped","Hoaxed","Webbed"],c:2,n:"Listeners encourage the narrator by saying 'Keep hoaxing me!'"},
-  {sec:"The Script",q:"At the start of Act 1, Ananse is wearing:",o:["A brand-new kente cloth","A shabby raincoat","A business suit","A traditional priest's robe"],c:1,n:"He enters hastily escaping the rain."},
-  {sec:"The Script",q:"Ananse calls for the typewriter he bought for Anansewa at a price that:",o:["Was a gift from the Chiefs","Nearly drove him to sell himself","Was paid for by Christie","Was half-price during a sale"],c:1,n:"This emphasises his financial desperation."},
-  {sec:"The Script",q:"What does Ananse specifically want for his 'comfortable future'?",o:["A straw-stuffed mattress","A soft, bouncy Dunlopillo mattress","A wooden stool from Nanka","A hammock in the garden"],c:1,n:"He uses this as an index of his lack of comfort."},
-  {sec:"The Script",q:"When typing the letters, Anansewa is told that 'Dear Chief of Sapa' is:",o:["Perfect and respectful","Too ordinary","A secret code","Too aggressive"],c:1,n:"He replaces it with grandiose appellations."},
-  {sec:"The Script",q:"The appellation 'Mighty-Tree-Of-Ancient-Origin' is addressed to:",o:["Togbe Klu IV","The Chief of the Mines","The Chief of Sapaase","Chief-Who-Is-Chief"],c:2,n:"This is the first letter Ananse dictates."},
-  {sec:"The Script",q:"Which Chief is described as 'Prickly-Pear! Cactus keeping guard'?",o:["Chief of Sapaase","Togbe Klu IV","Chief of the Mines","The unnamed chief from Mali"],c:1,n:"He is the Chief of Akate."},
-  {sec:"The Script",q:"The Chief of the Mines is addressed with a poem about:",o:["Driver ants being astir","Fire-extinguishers","Golden stools","Water to refresh friends"],c:0,n:"This identity is whispered into Anansewa's ear."},
-  {sec:"The Script",q:"Which Chief is described as the 'Fire-Extinguisher'?",o:["Togbe Klu IV","Chief of Sapaase","Chief-Who-Is-Chief","The Chief of the Mines"],c:2,n:"This title is used in his highly speed-recited letter."},
-  {sec:"The Script",q:"How much money does Ananse count out for Anansewa's fees in Act 1?",o:["Ten clean cedis","One hundred and twenty cedis","Fifty guineas","Five hundred cedis"],c:1,n:"It is described as clean money from his bulging wallet."},
-  {sec:"The Script",q:"What is Ananse's 'oracle' according to his own words?",o:["His bulging wallet","The typewriter","His eyes","The Storyteller"],c:2,n:"He quotes the rhesus monkey saying 'My eyes are my oracle.'"},
-  {sec:"The Script",q:"In Act 1, Anansewa realises her father is 'selling her' and sings that she is not:",o:["A schoolgirl","A parcel to a customer","A bota bead","A secretarial student"],c:1,n:"She insists she will select her lover herself."},
-  {sec:"The Script",q:"Ananse organises a 'most lively competition' around his daughter to:",o:["Make her the most famous woman in Ghana","Let human nature help disentangle the knot","Prove that he is the smartest man in Nanka","Get four cars instead of one"],c:1,n:"He counts on human nature to decide the winner."},
-  {sec:"The Script",q:"What is the 'head-drink' mentioned in the script?",o:["A celebratory gin after a hunt","A token sum and drinks to establish marriage legally","A ritual bath given to the bride","The water Ananse drinks to cure his headache"],c:1,n:"It is a formal token handed to the bride's family."},
-  {sec:"The Script",q:"The Postman delivers a letter in Act 2 to 'AW/6615 Lagoon Street' which is:",o:["A local hospital","Ananse's house","The Post Office headquarters","The Chief of the Mines' palace"],c:1,n:"The address is confirmed by the Storyteller."},
-  {sec:"The Script",q:"In Act 2, Ananse tells the Property Man to buy every newspaper to search for:",o:["Business advertisements","Notices of memorial services","News about the Chief of the Mines","Secretarial school results"],c:1,n:"He wants to attend services to 'deposit with the spenders.'"},
-  {sec:"The Script",q:"The workmen doubling their contract time to ten weeks is because:",o:["Ananse personally demanded it","The house is too large to finish quickly","They can exploit the 'man in their pocket'","There is a lack of building materials"],c:2,n:"They realise they can finish slowly and stay longer."},
-  {sec:"The Script",q:"Who is 'Abena' in the Mboguo song 'Am I Not Odum's Child'?",o:["Ananse's first wife","A delicate daughter unprepared for hardship","The Chief of Sapaase's mother","The girl Akwasi is chasing"],c:1,n:"She is the unseasoned one who'd 'rather be dead.'"},
-  {sec:"The Script",q:"Aya is upset by Anansewa's outdooring because it is:",o:["Five years too late","Too expensive for the family","Organised by the Storyteller","Not involving the four chiefs"],c:0,n:"She says it should have happened when she became a woman."},
-  {sec:"The Script",q:"What specific ritual item is 'passed over' Anansewa's head during the outdooring?",o:["A kente cloth","An egg","A glass of gin","A typewriter ribbon"],c:1,n:"It is her 'soul's egg' to attract good fortune."},
-  {sec:"The Script",q:"Ananse lies to Aya and Ekuwa about a fire at the cocoa farm in:",o:["Sapaase","Akate","Nanka","Lagoon Street"],c:2,n:"This is his ruse to get them to leave the house."},
-  {sec:"The Script",q:"How does Ananse instruct Anansewa to 'die' in preparation?",o:["To swallow a sleeping pill","To stiffen her limbs and hold her breath","To hide behind the spider's web","To run away to Mexico"],c:1,n:"He tells her to look as though she is dead."},
-  {sec:"The Script",q:"Which Chief sends a 'glass coffin' to the funeral?",o:["Chief of Sapaase","Chief of the Mines","Togbe Klu IV","Chief-Who-Is-Chief"],c:3,n:"He sends it to do what a 'real husband does.'"},
-  {sec:"The Script",q:"In the final libation, Ananse asks the ancestors to:",o:["Punish the three chiefs who sent bad gifts","Wake Anansewa if Chief-Who-Is-Chief is the right man","Burn down the rest of the cocoa farm","Give him a new soft Dunlopillo mattress"],c:1,n:"He asks them to 'Wake her!' if the marriage is desired."},
-  {sec:"The Script",q:"Anansewa's final 'awakening' is attributed by Ananse to the power of:",o:["Modern medicine","Amazing love","Traditional incantations","Her secretarial certificate"],c:1,n:"He claims love has won a victory."},
+const CHAPTERS = [
+  {
+    id:0, num:"01",
+    title:"Basic Atomic Theory, Semiconductors & PN Junctions",
+    desc:"Energy bands, doping, PN junction behaviour, breakdown mechanisms",
+    theory: CH1_THEORY,
+    calc: CH1_CALC,
+    ready: true,
+  },
+  {id:1,num:"02",title:"Diode Circuits & Applications",desc:"Rectifiers, clippers, clampers and diode applications",theory:[],calc:[],ready:false},
+  {id:2,num:"03",title:"Bipolar Junction Transistors (BJT)",desc:"BJT operation, biasing configurations and amplifier analysis",theory:[],calc:[],ready:false},
+  {id:3,num:"04",title:"Field-Effect Transistors (FET)",desc:"JFET, MOSFET operation and circuit applications",theory:[],calc:[],ready:false},
 ];
 
-const SETS = [
-  {id:0,label:"Set 1",title:"Analytical Overview — Part 1",icon:"🕷️",desc:"Dramatic devices, themes, characterisation & analytical framework (Q1–25)",qs:S1,col:"#f5a623"},
-  {id:1,label:"Set 2",title:"Analytical Overview — Part 2",icon:"🎭",desc:"Anansegoro, stagecraft, Storyteller's role & deeper thematic analysis (Q26–50)",qs:S2,col:"#a78bfa"},
-  {id:2,label:"Set 3",title:"The Script Itself",icon:"📜",desc:"Specific plot details, dialogue, character actions & scene-by-scene events (Q51–75)",qs:S3,col:"#34d399"},
-];
-
-const L=['A','B','C','D'], T=30;
-const OK=["Correct, Ohemaa!","Brilliant!","Spot on!","That's right!","Nailed it!","Excellent!","Perfect!","Well done!"];
-const NO=["Not quite — see the note!","Review this one carefully.","Tricky! Check the explanation.","Close, but not right.","Study this one again!"];
-const rnd=a=>a[Math.floor(Math.random()*a.length)];
-
-function Particles(){
-  const ps=Array.from({length:22},(_,i)=>({
-    left:Math.random()*100,delay:Math.random()*10,
-    dur:7+Math.random()*9,size:2+Math.random()*5,
-    col:['rgba(245,166,35,0.35)','rgba(167,139,250,0.35)','rgba(52,211,153,0.3)','rgba(255,255,255,0.17)'][i%4]
-  }));
-  return <div className="particles">{ps.map((p,i)=><div key={i} className="particle" style={{left:p.left+'%',bottom:'-10px',width:p.size+'px',height:p.size+'px',background:p.col,animationDelay:p.delay+'s',animationDuration:p.dur+'s'}}/>)}</div>;
-}
+const THEORY_TIME = 45;
+const CALC_TIME = 60;
+const L = ['A','B','C','D'];
+const OK = ["Correct!","Brilliant!","Spot on!","That's right!","Nailed it!","Excellent!","Perfect!"];
+const NO = ["Not quite — see the note!","Review this one carefully.","Check the explanation.","Close, but not right.","Study this one again!"];
+const rnd = a => a[Math.floor(Math.random()*a.length)];
 
 function App(){
-  const [view,setView]=useState('name');
-  const [name,setName]=useState('');
-  const [qs,setQs]=useState([]);
-  const [slbl,setSlbl]=useState('');
-  const [scol,setScol]=useState('#f5a623');
-  const [sidx,setSidx]=useState(0);
-  const [qi,setQi]=useState(0);
-  const [sel,setSel]=useState(null);
-  const [rev,setRev]=useState(false);
-  const [ans,setAns]=useState([]);
-  const [tl,setTl]=useState(T);
-  const [streak,setStreak]=useState(0);
-  const [best,setBest]=useState(0);
-  const tmr=useRef(null);
+  const [view, setView] = useState('name');
+  const [name, setName] = useState('');
+  const [selCh, setSelCh] = useState(null);
+  const [qType, setQType] = useState(null); // 'theory' | 'calc'
+  const [qs, setQs] = useState([]);
+  const [qi, setQi] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [rev, setRev] = useState(false);
+  const [ans, setAns] = useState([]);
+  const [tl, setTl] = useState(THEORY_TIME);
+  const [streak, setStreak] = useState(0);
+  const [best, setBest] = useState(0);
+  const tmr = useRef(null);
+
+  const timeLimit = qType === 'calc' ? CALC_TIME : THEORY_TIME;
 
   useEffect(()=>{
-    if(view!=='quiz') return;
+    if(view !== 'quiz') return;
     if(rev){clearInterval(tmr.current);return;}
-    tmr.current=setInterval(()=>{
+    tmr.current = setInterval(()=>{
       setTl(t=>{
-        if(t<=1){clearInterval(tmr.current);reveal(null);return 0;}
+        if(t <= 1){clearInterval(tmr.current);doReveal(null);return 0;}
         return t-1;
       });
     },1000);
     return()=>clearInterval(tmr.current);
   },[view,qi,rev]);
 
-  const reveal=(idx)=>{
-    const q=qs[qi];
-    const ok=idx===q.c;
-    const ns=ok?streak+1:0;
+  const doReveal = (idx)=>{
+    const q = qs[qi];
+    const ok = idx === q.c;
+    const ns = ok ? streak+1 : 0;
     setStreak(ns); setBest(b=>Math.max(b,ns));
     setAns(p=>[...p,{chosen:idx,correct:q.c,ok}]);
     setSel(idx); setRev(true);
   };
 
-  const pick=(idx)=>{
-    if(rev)return;
+  const pick = (idx)=>{
+    if(rev) return;
     clearInterval(tmr.current);
     setSel(idx);
-    setTimeout(()=>reveal(idx),180);
+    setTimeout(()=>doReveal(idx),180);
   };
 
-  const next=()=>{
-    if(qi+1>=qs.length){submit();setView('results');}
-    else{setQi(qi+1);setSel(null);setRev(false);setTl(T);}
+  const next = ()=>{
+    if(qi+1 >= qs.length){ setView('results'); }
+    else{ setQi(qi+1); setSel(null); setRev(false); setTl(timeLimit); }
   };
 
-  const submit=async()=>{
-    const sc=ans.filter(a=>a.ok).length;
-    try{await fetch(GSURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentName:name,sheet:'Sheet1',rawScore:sc,finalScore:sc,totalQuestions:qs.length,percentage:((sc/qs.length)*100).toFixed(1),setUsed:slbl,timestamp:new Date().toLocaleString()})});}catch(e){}
-  };
-
-  const startSet=(s)=>{
-    setQs(s.qs);setSlbl(s.label+' — '+s.title);setScol(s.col);setSidx(s.id);
-    setQi(0);setAns([]);setSel(null);setRev(false);setTl(T);setStreak(0);setBest(0);
+  const startQuiz = (ch, type)=>{
+    const questions = type === 'theory' ? ch.theory : ch.calc;
+    setSelCh(ch); setQType(type); setQs(questions);
+    setQi(0); setAns([]); setSel(null); setRev(false);
+    setTl(type === 'calc' ? CALC_TIME : THEORY_TIME);
+    setStreak(0); setBest(0);
     setView('quiz');
   };
 
-  const score=ans.filter(a=>a.ok).length;
-  const pct=qs.length?Math.round((score/qs.length)*100):0;
-  const grade=(p)=>{
-    if(p>=90)return{lbl:'Outstanding! 🏆',bg:'#34d399',col:'#022c22'};
-    if(p>=75)return{lbl:'Excellent! ⭐',bg:'#f5a623',col:'#1a0a00'};
-    if(p>=60)return{lbl:'Good work! 👍',bg:'#60a5fa',col:'#1e3a5f'};
-    if(p>=50)return{lbl:'Keep going! 📖',bg:'#a78bfa',col:'#1e1b4b'};
-    return{lbl:'More revision needed 💪',bg:'#f87171',col:'#2c0000'};
-  };
-  const g=grade(pct);
-  const tc=tl>15?'tok':tl>8?'twarn':'tdanger';
+  const score = ans.filter(a=>a.ok).length;
+  const pct = qs.length ? Math.round((score/qs.length)*100) : 0;
 
-  if(view==='name') return(
-    <div className="app"><Particles/><div className="web-bg"/>
+  const grade = (p)=>{
+    if(p>=90) return {lbl:'Outstanding! 🏆',bg:'#a8ff3e',col:'#060a12'};
+    if(p>=75) return {lbl:'Excellent! ⭐',bg:'#00dcff',col:'#060a12'};
+    if(p>=60) return {lbl:'Good work! 👍',bg:'#ff6b35',col:'#fff'};
+    if(p>=50) return {lbl:'Keep going! 📖',bg:'#a78bfa',col:'#fff'};
+    return {lbl:'More revision needed 💪',bg:'#f87171',col:'#fff'};
+  };
+
+  const g = grade(pct);
+  const tc = tl > (timeLimit*0.5) ? 'tok' : tl > (timeLimit*0.25) ? 'twarn' : 'tdanger';
+  const accentColor = qType === 'calc' ? 'var(--calc)' : 'var(--theory)';
+  const q = qs[qi];
+  const lastAns = ans[ans.length-1];
+
+  if(view === 'name') return (
+    <div className="app">
+      <div className="grid-bg"/>
       <div className="card">
-        <div style={{textAlign:'center',marginBottom:28}}>
-          <div style={{fontSize:'3.2rem',marginBottom:10}}>🕸️</div>
-          <h1>Anansewa Revision</h1>
-          <p className="sub">The Marriage of Anansewa · Efua Sutherland<br/>75 questions across 3 sets — test your mastery!</p>
+        <div className="logo-row">
+          <div className="logo-icon">⚡</div>
+          <div>
+            <div className="logo-text">Electronics Revision</div>
+          </div>
         </div>
-        <input type="text" placeholder="Enter your name..." value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&setView('choose')}/>
-        <button className="btn btn-primary" onClick={()=>{if(name.trim())setView('choose');}}>Let's go →</button>
+        <h1>Master <span>Electronics</span><br/>One Question at a Time</h1>
+        <p className="sub">Chapter-by-chapter MCQ revision.<br/>Theory mode: 45s/question · Calculation mode: 60s/question</p>
+        <input type="text" placeholder="Enter your name to begin..."
+          value={name} onChange={e=>setName(e.target.value)}
+          onKeyDown={e=>e.key==='Enter'&&name.trim()&&setView('chapter')}/>
+        <button className="btn-primary" onClick={()=>{if(name.trim())setView('chapter');}}>
+          Begin Revision →
+        </button>
       </div>
     </div>
   );
 
-  if(view==='choose') return(
-    <div className="app"><Particles/><div className="web-bg"/>
+  if(view === 'chapter') return (
+    <div className="app">
+      <div className="grid-bg"/>
       <div className="card">
-        <h2>Welcome, {name.split(' ')[0]}! 👋</h2>
-        <p className="sub">Three sets of 25 questions each. Pick a set to begin — 30 seconds per question.</p>
-        <div className="set-cards">
-          {SETS.map(s=>(
-            <div key={s.id} className="set-card" style={{'--hc':s.col}} onClick={()=>startSet(s)}
-              onMouseEnter={e=>{e.currentTarget.style.background=`${s.col}18`;e.currentTarget.style.borderColor=`${s.col}55`;}}
-              onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,255,255,0.06)';e.currentTarget.style.borderColor='rgba(255,255,255,0.13)';}}>
-              <div className="icon">{s.icon}</div>
-              <div style={{flex:1}}><h3>{s.title}</h3><p>{s.desc}</p></div>
-              <div className="badge" style={{background:`${s.col}22`,color:s.col}}>{s.label}</div>
+        <p className="section-label">Select Chapter</p>
+        <h2>Hello, {name.split(' ')[0]}! 👋</h2>
+        <p className="sub" style={{marginBottom:24}}>Choose a chapter to start revising. Completed chapters show both Theory & Calculation modes.</p>
+        <div className="ch-grid">
+          {CHAPTERS.map(ch=>(
+            <div key={ch.id}
+              className={`ch-card${!ch.ready?' wip':''}`}
+              onClick={()=>ch.ready&&setView('type_select')===undefined&&ch.ready&&(setSelCh(ch)||setView('type_select'))}
+            >
+              <div className="ch-num">{ch.num}</div>
+              <div className="ch-info">
+                <h3>{ch.title}</h3>
+                <p>{ch.desc}</p>
+              </div>
+              {ch.ready
+                ? <div className="ready-badge">READY</div>
+                : <div className="wip-badge">IN PROGRESS</div>
+              }
             </div>
           ))}
         </div>
@@ -393,34 +471,324 @@ function App(){
     </div>
   );
 
-  if(view==='quiz'){
-    const q=qs[qi];
-    const prog=(qi/qs.length)*100;
-    const lastAns=ans[ans.length-1];
-    return(
-      <div className="app"><Particles/><div className="web-bg"/>
+  if(view === 'type_select' && selCh) return (
+    <div className="app">
+      <div className="grid-bg"/>
+      <div className="card">
+        <button onClick={()=>setView('chapter')} style={{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',fontFamily:'Space Mono',fontSize:'0.8rem',marginBottom:20,padding:0}}>← Back</button>
+        <p className="section-label">Chapter {selCh.num}</p>
+        <h2>{selCh.title}</h2>
+        <p className="sub" style={{marginBottom:24}}>Choose your quiz mode for this chapter:</p>
+        <div className="type-grid">
+          <div className="type-card theory-card" onClick={()=>startQuiz(selCh,'theory')}>
+            <div className="type-icon">📚</div>
+            <h3>Theory MCQs</h3>
+            <p>Conceptual questions covering definitions, mechanisms and principles</p>
+            <div className="type-timer theory-timer">{selCh.theory.length} questions · 45s each</div>
+          </div>
+          <div className="type-card calc-card" onClick={()=>startQuiz(selCh,'calc')}>
+            <div className="type-icon">🧮</div>
+            <h3>Calculation MCQs</h3>
+            <p>Numerical problems requiring formulas, substitution and computation</p>
+            <div className="type-timer calc-timer">{selCh.calc.length} questions · 60s each</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if(view === 'quiz' && q) {
+    const prog = (qi/qs.length)*100;
+    return (
+      <div className="app">
+        <div className="grid-bg"/>
         <div className="card">
-          <div className="progress-wrap">
-            <div className="progress-top">
-              <span>{qi+1} / {qs.length}</span>
-              <span className="streak-txt">
-                {streak>=2?<span style={{color:scol,fontWeight:700}}>🔥 {streak} in a row!</span>
-                  :<span style={{color:'rgba(255,255,255,0.48)'}}>{score} correct so far</span>}
-              </span>
-            </div>
-            <div className="progress-bar"><div className="progress-fill" style={{width:prog+'%',background:`linear-gradient(90deg,${scol},#34d399)`}}/></div>
+          <div className="progress-top">
+            <span>{qi+1} / {qs.length}</span>
+            <span className="streak-info">
+              {streak >= 2
+                ? <span style={{color:accentColor,fontWeight:700}}>🔥 {streak} streak</span>
+                : <span>{score} correct</span>}
+            </span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{width:prog+'%',background:`linear-gradient(90deg,${accentColor},var(--accent3))`}}/>
           </div>
           <div className="timer-row">
-            <div style={{flex:1}}><div className="stag" style={{background:`${scol}22`,color:scol}}>{q.sec}</div></div>
-            <div className={`timer-circle ${tc}`}>{tl}s</div>
+            <div>
+              <div className={`q-tag ${qType==='theory'?'theory-tag':'calc-tag'}`}>
+                {qType === 'theory' ? '📚 THEORY' : '🧮 CALCULATION'} · {q.part}
+              </div>
+            </div>
+            <div className={`timer-ring ${tc}`}>{tl}s</div>
+          </div>
+          <p className="q-text">{q.q}</p>
+          <div className="options">
+            {q.o.map((opt,idx)=>{
+              let cls = 'option';
+              if(rev){
+                if(idx === q.c) cls += ' cor';
+                else if(idx === sel && idx !== q.c) cls += ' wrg';
+                cls += ' locked';
+              } else if(idx === sel) cls += ' sel';
+              return (
+                <div key={idx} className={cls} onClick={()=>pick(idx)}>
+                  <span className="opt-letter">{L[idx]}</span>
+                  <span>{opt}</span>
+                </div>
+              );
+            })}
+          </div>
+          {rev && (
+            <div className={`fb ${lastAns?.ok?'fb-ok':'fb-no'}`}>
+              <strong>{lastAns?.ok ? rnd(OK) : rnd(NO)}</strong>
+              <br/><span style={{opacity:0.85}}>{q.n}</span>
+            </div>
+          )}
+          {rev && (
+            <button className="next-btn"
+              style={{background:`linear-gradient(135deg,${accentColor},var(--accent3))`}}
+              onClick={next}>
+              {qi+1 >= qs.length ? 'See Results 🎉' : 'Next →'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if(view === 'results') return (
+    <div className="app">
+      <div className="grid-bg"/>
+      <div className="card">
+        <div style={{textAlign:'center',marginBottom:8}}>
+          <div style={{fontSize:'2.2rem',marginBottom:8}}>⚡</div>
+          <h2>Done, {name.split(' ')[0]}!</h2>
+          <p style={{fontSize:'0.78rem',color:'var(--muted)',marginTop:4,fontFamily:'Space Mono'}}>
+            Ch.{selCh?.num} · {qType==='theory'?'Theory MCQs':'Calculation MCQs'}
+          </p>
+        </div>
+        <div className="score-big" style={{
+          background:`linear-gradient(135deg,${accentColor},var(--accent3))`,
+          WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'
+        }}>{score}/{qs.length}</div>
+        <p className="score-lbl">{pct}% correct</p>
+        <div className="grade-badge" style={{background:g.bg,color:g.col}}>{g.lbl}</div>
+        <div className="stat-row">
+          <div className="stat"><div className="n" style={{color:'var(--accent3)'}}>{score}</div><div className="l">Correct</div></div>
+          <div className="stat"><div className="n" style={{color:'#f87171'}}>{qs.length-score}</div><div className="l">Missed</div></div>
+          <div className="stat"><div className="n" style={{color:accentColor}}>{best}</div><div className="l">Best Streak</div></div>
+        </div>
+        <div className="advice">
+          {pct>=80
+            ? "Excellent grasp of the material! Review any missed items to achieve full mastery before your exam."
+            : pct>=60
+            ? qType==='theory'
+              ? "Good foundation! Focus on: energy band transitions, the Mass Action Law (n·p = nᵢ²), and differences between Zener vs Avalanche breakdown."
+              : "Decent start on calculations! Practice the barrier voltage formula V₀ = V_T·ln(N_A·N_D/nᵢ²) and unit conversions (eV ↔ Joules) until automatic."
+            : qType==='theory'
+            ? "Revisit core concepts: bandgap energy, n-type vs p-type doping, depletion region formation, and the direction of diffusion vs drift currents."
+            : "Go back to basics: Master the Mass Action Law, eV-to-Joule conversion, and the reverse bias potential formula before attempting calculations again."
+          }
+        </div>
+        <div className="btn-row">
+          <button className="btn-sec" onClick={()=>startQuiz(selCh,qType)}>Retry this set</button>
+          <button className="btn-sec" onClick={()=>setView('type_select')}>Switch mode</button>
+        </div>
+        <button className="btn-primary" onClick={()=>setView('chapter')}>Back to Chapters</button>
+      </div>
+    </div>
+  );
+
+  return null;
+}
+
+// Fix chapter selection handler
+function FixedApp(){
+  const [view, setView] = useState('name');
+  const [name, setName] = useState('');
+  const [selCh, setSelCh] = useState(null);
+  const [qType, setQType] = useState(null);
+  const [qs, setQs] = useState([]);
+  const [qi, setQi] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [rev, setRev] = useState(false);
+  const [ans, setAns] = useState([]);
+  const [tl, setTl] = useState(THEORY_TIME);
+  const [streak, setStreak] = useState(0);
+  const [best, setBest] = useState(0);
+  const tmr = useRef(null);
+
+  const timeLimit = qType === 'calc' ? CALC_TIME : THEORY_TIME;
+  const accentColor = qType === 'calc' ? 'var(--calc)' : 'var(--theory)';
+
+  useEffect(()=>{
+    if(view !== 'quiz') return;
+    if(rev){clearInterval(tmr.current);return;}
+    tmr.current = setInterval(()=>{
+      setTl(t=>{
+        if(t <= 1){clearInterval(tmr.current);doReveal(null);return 0;}
+        return t-1;
+      });
+    },1000);
+    return()=>clearInterval(tmr.current);
+  },[view,qi,rev]);
+
+  const doReveal = (idx)=>{
+    const q = qs[qi];
+    const ok = idx === q.c;
+    const ns = ok ? streak+1 : 0;
+    setStreak(ns); setBest(b=>Math.max(b,ns));
+    setAns(p=>[...p,{chosen:idx,correct:q.c,ok}]);
+    setSel(idx); setRev(true);
+  };
+
+  const pick = (idx)=>{
+    if(rev) return;
+    clearInterval(tmr.current);
+    setSel(idx);
+    setTimeout(()=>doReveal(idx),180);
+  };
+
+  const next = ()=>{
+    if(qi+1 >= qs.length){ setView('results'); }
+    else{ setQi(qi+1); setSel(null); setRev(false); setTl(timeLimit); }
+  };
+
+  const startQuiz = (ch, type)=>{
+    const questions = type === 'theory' ? ch.theory : ch.calc;
+    setSelCh(ch); setQType(type); setQs(questions);
+    setQi(0); setAns([]); setSel(null); setRev(false);
+    setTl(type === 'calc' ? CALC_TIME : THEORY_TIME);
+    setStreak(0); setBest(0);
+    setView('quiz');
+  };
+
+  const score = ans.filter(a=>a.ok).length;
+  const pct = qs.length ? Math.round((score/qs.length)*100) : 0;
+
+  const grade = (p)=>{
+    if(p>=90) return {lbl:'Outstanding! 🏆',bg:'#a8ff3e',col:'#060a12'};
+    if(p>=75) return {lbl:'Excellent! ⭐',bg:'#00dcff',col:'#060a12'};
+    if(p>=60) return {lbl:'Good work! 👍',bg:'#ff6b35',col:'#fff'};
+    if(p>=50) return {lbl:'Keep going! 📖',bg:'#a78bfa',col:'#fff'};
+    return {lbl:'More revision needed 💪',bg:'#f87171',col:'#fff'};
+  };
+  const g = grade(pct);
+  const tc = tl > (timeLimit*0.5) ? 'tok' : tl > (timeLimit*0.25) ? 'twarn' : 'tdanger';
+  const q = qs[qi];
+  const lastAns = ans[ans.length-1];
+
+  if(view==='name') return(
+    <div className="app">
+      <div className="grid-bg"/>
+      <div className="card">
+        <div className="logo-row">
+          <div className="logo-icon">⚡</div>
+          <div><div className="logo-text">Electronics Revision · EE Dept</div></div>
+        </div>
+        <h1>Master <span>Electronics</span><br/>One Question at a Time</h1>
+        <p className="sub">Chapter-by-chapter MCQ revision.<br/>📚 Theory mode: 45s/question &nbsp;·&nbsp; 🧮 Calculation mode: 60s/question</p>
+        <input type="text" placeholder="Enter your name to begin..."
+          value={name} onChange={e=>setName(e.target.value)}
+          onKeyDown={e=>e.key==='Enter'&&name.trim()&&setView('chapter')}/>
+        <button className="btn-primary" onClick={()=>{if(name.trim())setView('chapter');}}>
+          Begin Revision →
+        </button>
+      </div>
+    </div>
+  );
+
+  if(view==='chapter') return(
+    <div className="app">
+      <div className="grid-bg"/>
+      <div className="card">
+        <p className="section-label">Select Chapter</p>
+        <h2>Hello, {name.split(' ')[0]}! 👋</h2>
+        <p className="sub" style={{marginBottom:22}}>Select a ready chapter. Chapters 2–4 are being prepared.</p>
+        <div className="ch-grid">
+          {CHAPTERS.map(ch=>(
+            <div key={ch.id}
+              className={`ch-card${!ch.ready?' wip':''}`}
+              onClick={()=>{if(ch.ready){setSelCh(ch);setView('type_select');}}}
+            >
+              <div className="ch-num">{ch.num}</div>
+              <div className="ch-info">
+                <h3>{ch.title}</h3>
+                <p>{ch.desc}</p>
+              </div>
+              {ch.ready
+                ? <div className="ready-badge">READY</div>
+                : <div className="wip-badge">IN PROGRESS</div>
+              }
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  if(view==='type_select'&&selCh) return(
+    <div className="app">
+      <div className="grid-bg"/>
+      <div className="card">
+        <button onClick={()=>setView('chapter')} style={{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',fontFamily:'Space Mono',fontSize:'0.78rem',marginBottom:20,padding:0,display:'flex',alignItems:'center',gap:6}}>
+          ← Back to chapters
+        </button>
+        <p className="section-label">Chapter {selCh.num}</p>
+        <h2 style={{marginBottom:6}}>{selCh.title}</h2>
+        <p className="sub" style={{marginBottom:24}}>{selCh.desc}</p>
+        <div className="type-grid">
+          <div className="type-card theory-card" onClick={()=>startQuiz(selCh,'theory')}>
+            <div className="type-icon">📚</div>
+            <h3>Theory MCQs</h3>
+            <p>Conceptual questions — definitions, mechanisms, principles and qualitative reasoning</p>
+            <div className="type-timer theory-timer">{selCh.theory.length} questions · 45s each</div>
+          </div>
+          <div className="type-card calc-card" onClick={()=>startQuiz(selCh,'calc')}>
+            <div className="type-icon">🧮</div>
+            <h3>Calculation MCQs</h3>
+            <p>Numerical problems — formula application, substitution and multi-step computation</p>
+            <div className="type-timer calc-timer">{selCh.calc.length} questions · 60s each</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if(view==='quiz'&&q){
+    const prog = (qi/qs.length)*100;
+    return(
+      <div className="app">
+        <div className="grid-bg"/>
+        <div className="card">
+          <div className="progress-top">
+            <span>{qi+1} / {qs.length}</span>
+            <span className="streak-info">
+              {streak>=2
+                ?<span style={{color:accentColor,fontWeight:700}}>🔥 {streak} in a row!</span>
+                :<span>{score} correct so far</span>}
+            </span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{width:prog+'%',background:`linear-gradient(90deg,${accentColor},var(--accent3))`}}/>
+          </div>
+          <div className="timer-row">
+            <div>
+              <div className={`q-tag ${qType==='theory'?'theory-tag':'calc-tag'}`}>
+                {qType==='theory'?'📚 THEORY':'🧮 CALCULATION'}
+              </div>
+              <div style={{fontSize:'0.72rem',color:'var(--muted)',marginTop:5,fontFamily:'Space Mono'}}>{q.part}</div>
+            </div>
+            <div className={`timer-ring ${tc}`}>{tl}s</div>
           </div>
           <p className="q-text">{q.q}</p>
           <div className="options">
             {q.o.map((opt,idx)=>{
               let cls='option';
               if(rev){
-                if(idx===q.c)cls+=' cor';
-                else if(idx===sel&&idx!==q.c)cls+=' wrg';
+                if(idx===q.c) cls+=' cor';
+                else if(idx===sel&&idx!==q.c) cls+=' wrg';
                 cls+=' locked';
               } else if(idx===sel) cls+=' sel';
               return(
@@ -434,12 +802,14 @@ function App(){
           {rev&&(
             <div className={`fb ${lastAns?.ok?'fb-ok':'fb-no'}`}>
               <strong>{lastAns?.ok?rnd(OK):rnd(NO)}</strong>
-              <br/><span style={{opacity:0.88}}>{q.n}</span>
+              <br/><span style={{opacity:0.85,fontSize:'0.83rem'}}>{q.n}</span>
             </div>
           )}
           {rev&&(
-            <button className="next-btn" style={{background:`linear-gradient(135deg,${scol},#34d399)`}} onClick={next}>
-              {qi+1>=qs.length?'See my results 🎉':'Next question →'}
+            <button className="next-btn"
+              style={{background:`linear-gradient(135deg,${accentColor},var(--accent3))`}}
+              onClick={next}>
+              {qi+1>=qs.length?'See Results 🎉':'Next Question →'}
             </button>
           )}
         </div>
@@ -448,38 +818,53 @@ function App(){
   }
 
   if(view==='results') return(
-    <div className="app"><Particles/><div className="web-bg"/>
+    <div className="app">
+      <div className="grid-bg"/>
       <div className="card">
         <div style={{textAlign:'center',marginBottom:8}}>
-          <div style={{fontSize:'2.5rem',marginBottom:8}}>🎭</div>
+          <div style={{fontSize:'2rem',marginBottom:8}}>⚡</div>
           <h2>Done, {name.split(' ')[0]}!</h2>
-          <p style={{fontSize:'0.8rem',color:'rgba(255,255,255,0.38)',marginTop:4}}>{slbl}</p>
+          <p style={{fontSize:'0.76rem',color:'var(--muted)',fontFamily:'Space Mono',marginTop:4}}>
+            Ch.{selCh?.num} · {qType==='theory'?'Theory MCQs':'Calculation MCQs'}
+          </p>
         </div>
-        <div className="score-big">{score}/{qs.length}</div>
+        <div className="score-big" style={{
+          background:`linear-gradient(135deg,${accentColor},var(--accent3))`,
+          WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'
+        }}>{score}/{qs.length}</div>
         <p className="score-lbl">{pct}% correct</p>
         <div className="grade-badge" style={{background:g.bg,color:g.col}}>{g.lbl}</div>
         <div className="stat-row">
-          <div className="stat"><div className="n" style={{color:'#34d399'}}>{score}</div><div className="l">Correct</div></div>
+          <div className="stat"><div className="n" style={{color:'var(--accent3)'}}>{score}</div><div className="l">Correct</div></div>
           <div className="stat"><div className="n" style={{color:'#f87171'}}>{qs.length-score}</div><div className="l">Missed</div></div>
-          <div className="stat"><div className="n" style={{color:scol}}>{best}</div><div className="l">Best streak</div></div>
+          <div className="stat"><div className="n" style={{color:accentColor}}>{best}</div><div className="l">Best Streak</div></div>
         </div>
         <div className="advice">
-          {pct>=80?"Excellent command of the play! Review any missed items and you are fully prepared."
-          :pct>=60?"Good foundation! Pay closer attention to the analytical devices — Mboguo, Mime, and the Spider's Web symbolism are especially important."
-          :"Focus on the core themes: greed, female commodification, and how Anansegoro works as a theatrical form. Revisit the Storyteller's role and the dramatic structure."}
+          {pct>=80
+            ?"Strong performance! Review any missed items — you're well-prepared for this chapter."
+            :pct>=60
+            ? qType==='theory'
+              ?"Good foundation! Focus on: energy band transitions, the Mass Action Law (n·p = nᵢ²), and differences between Zener vs Avalanche breakdown."
+              :"Decent start! Drill the barrier voltage formula V₀ = V_T·ln(N_A·N_D/nᵢ²) and eV ↔ Joule conversions until they're automatic."
+            : qType==='theory'
+            ?"Revisit core concepts: bandgap energy, n-type vs p-type doping, depletion region formation, and diffusion vs drift currents."
+            :"Go back to basics: Master the Mass Action Law, eV conversions, and reverse bias potential formula before attempting calculations again."
+          }
         </div>
         <div className="btn-row">
-          <button className="btn-sec" onClick={()=>startSet(SETS[sidx])}>Retry this set</button>
-          <button className="btn-sec" onClick={()=>setView('choose')}>Try another set</button>
+          <button className="btn-sec" onClick={()=>startQuiz(selCh,qType)}>↺ Retry this set</button>
+          <button className="btn-sec" onClick={()=>{setSelCh(selCh);setView('type_select');}}>⇄ Switch mode</button>
         </div>
-        <button className="btn btn-primary" onClick={()=>{setView('name');setName('');}}>All done ✓</button>
+        <button className="btn-primary" onClick={()=>setView('chapter')}>← Back to Chapters</button>
       </div>
     </div>
   );
+
+  return null;
 }
 
-const root=ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App/>);
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<FixedApp/>);
 </script>
 </body>
 </html>
