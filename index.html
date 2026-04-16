@@ -1,995 +1,451 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Java Exam Practice</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0f0f1a; --surface: #1a1a2e; --card: #16213e;
-    --accent: #7c3aed; --accent2: #06b6d4; --accent3: #10b981;
-    --danger: #ef4444; --warn: #f59e0b; --text: #f1f5f9;
-    --muted: #94a3b8; --border: rgba(255,255,255,0.1);
-    --success: #22c55e; --purple-light: #a78bfa;
-  }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-
-  .page { display: none; min-height: 100vh; padding: 20px; }
-  .page.active { display: block; }
-
-  .home-hero { text-align: center; padding: 60px 20px 40px; }
-  .home-hero h1 { font-size: 2.8rem; font-weight: 700; background: linear-gradient(135deg, #7c3aed, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-  .home-hero p { color: var(--muted); font-size: 1.1rem; }
-  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; max-width: 900px; margin: 0 auto 40px; padding: 0 10px; }
-  .topic-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-  .topic-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(124,58,237,0.25); }
-  .topic-card.locked { opacity: 0.7; cursor: default; }
-  .topic-card .icon { font-size: 2rem; margin-bottom: 12px; }
-  .topic-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
-  .topic-card .desc { font-size: 0.82rem; color: var(--muted); }
-  .topic-card .status-badge { position: absolute; top: 12px; right: 12px; font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
-  .status-badge.available { background: rgba(16,185,129,0.2); color: var(--accent3); border: 1px solid var(--accent3); }
-  .status-badge.pending { background: rgba(245,158,11,0.2); color: var(--warn); border: 1px solid var(--warn); }
-  .topic-card .progress-wrap { margin-top: 14px; }
-  .topic-card .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 4px; }
-  .topic-card .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.5s; }
-  .topic-card .stars { font-size: 0.75rem; color: var(--warn); margin-top: 4px; }
-
-  .mode-page { max-width: 700px; margin: 0 auto; padding-top: 40px; }
-  .mode-page h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
-  .mode-page .subtitle { color: var(--muted); margin-bottom: 32px; }
-  .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .mode-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .mode-card:hover:not(.disabled) { border-color: var(--accent2); transform: translateY(-3px); }
-  .mode-card.disabled { opacity: 0.5; cursor: not-allowed; }
-  .mode-card .m-icon { font-size: 2.5rem; margin-bottom: 12px; }
-  .mode-card h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
-  .mode-card p { font-size: 0.82rem; color: var(--muted); }
-  .mode-card .lock-info { margin-top: 10px; font-size: 0.78rem; color: var(--warn); }
-  .back-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); cursor: pointer; font-size: 0.9rem; margin-bottom: 24px; }
-  .back-btn:hover { color: var(--text); }
-
-  .quiz-wrap { max-width: 860px; margin: 0 auto; padding-top: 20px; }
-  .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 10px; }
-  .quiz-title { font-size: 1rem; font-weight: 600; color: var(--accent2); }
-  .quiz-meta { display: flex; gap: 16px; align-items: center; }
-  .q-counter { font-size: 0.85rem; color: var(--muted); }
-  .timer-ring { position: relative; width: 52px; height: 52px; }
-  .timer-ring svg { transform: rotate(-90deg); }
-  .timer-ring circle.bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 4; }
-  .timer-ring circle.fg { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
-  .timer-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 0.8rem; font-weight: 700; }
-  .progress-strip { height: 5px; background: rgba(255,255,255,0.07); border-radius: 5px; margin-bottom: 24px; }
-  .progress-strip-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s; }
-  .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 20px; }
-  .q-tag { font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(124,58,237,0.2); color: var(--purple-light); margin-bottom: 14px; display: inline-block; }
-  .q-text { font-size: 1.05rem; line-height: 1.7; margin-bottom: 20px; }
-  .q-code { background: #0d1117; border: 1px solid var(--border); border-radius: 10px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.85rem; color: #e2e8f0; margin-bottom: 20px; white-space: pre; overflow-x: auto; line-height: 1.6; }
-  .options { display: grid; gap: 10px; }
-  .option-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; text-align: left; cursor: pointer; font-size: 0.95rem; color: var(--text); transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
-  .option-btn:hover:not(:disabled) { border-color: var(--accent2); background: rgba(6,182,212,0.08); }
-  .option-btn.selected { border-color: var(--accent); background: rgba(124,58,237,0.12); }
-  .option-btn.correct { border-color: var(--success); background: rgba(34,197,94,0.12); }
-  .option-btn.wrong { border-color: var(--danger); background: rgba(239,68,68,0.12); }
-  .option-btn:disabled { cursor: default; }
-  .opt-label { width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0; }
-  .correct .opt-label { background: rgba(34,197,94,0.3); }
-  .wrong .opt-label { background: rgba(239,68,68,0.3); }
-
-  .code-editor-wrap { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #0d1117; }
-  .editor-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #161b22; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
-  .editor-toolbar .lang-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; background: rgba(124,58,237,0.25); color: var(--purple-light); font-weight: 600; }
-  .editor-toolbar .editor-btns { display: flex; gap: 8px; }
-  .editor-toolbar button { font-size: 0.82rem; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-weight: 600; transition: all 0.15s; }
-  .btn-run { background: var(--accent); color: #fff; border-color: var(--accent) !important; }
-  .btn-run:hover { background: #6d28d9; }
-  .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-clear { background: transparent; color: var(--muted); }
-  .btn-clear:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-  .btn-hint { background: rgba(245,158,11,0.15); color: var(--warn); border-color: var(--warn) !important; }
-  .btn-hint:hover { background: rgba(245,158,11,0.25); }
-  .code-textarea { width: 100%; min-height: 200px; background: #0d1117; border: none; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.9rem; color: #e2e8f0; resize: vertical; outline: none; line-height: 1.7; tab-size: 4; }
-  .output-panel { border-top: 1px solid var(--border); }
-  .output-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #161b22; }
-  .output-header span { font-size: 0.75rem; color: var(--muted); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
-  .output-status { font-size: 0.72rem; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
-  .status-running { background: rgba(245,158,11,0.2); color: var(--warn); }
-  .status-pass { background: rgba(34,197,94,0.2); color: var(--success); }
-  .status-fail { background: rgba(239,68,68,0.2); color: var(--danger); }
-  .status-error { background: rgba(239,68,68,0.2); color: var(--danger); }
-  .output-body { padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6; min-height: 60px; white-space: pre-wrap; }
-  .output-body.out-pass { color: #a3e635; }
-  .output-body.out-fail { color: #f87171; }
-  .output-body.out-error { color: #fb923c; }
-  .output-body.out-running { color: var(--muted); }
-
-  .test-cases { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-top: 10px; }
-  .test-cases .tc-head { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
-  .test-case { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.82rem; }
-  .test-case:last-child { border-bottom: none; }
-  .tc-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); flex-shrink: 0; }
-  .tc-dot.pass { background: var(--success); }
-  .tc-dot.fail { background: var(--danger); }
-  .tc-label { color: var(--muted); flex: 1; }
-  .tc-expected { color: #a3e635; font-family: 'Courier New', monospace; }
-  .tc-got { color: #f87171; font-family: 'Courier New', monospace; }
-
-  .hint-box { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 12px 16px; margin-top: 10px; font-size: 0.85rem; color: var(--warn); line-height: 1.6; }
-  .hint-box strong { display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
-
-  .explanation { background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.25); border-radius: 14px; padding: 18px 20px; margin-top: 16px; }
-  .explanation .ex-head { font-size: 0.8rem; font-weight: 700; color: var(--accent2); margin-bottom: 6px; }
-  .explanation p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
-  .next-btn { display: block; width: 100%; margin-top: 16px; padding: 14px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; letter-spacing: 0.02em; transition: opacity 0.2s; }
-  .next-btn:hover { opacity: 0.9; }
-
-  .results-wrap { max-width: 680px; margin: 0 auto; padding: 40px 20px; text-align: center; }
-  .score-ring { position: relative; width: 140px; height: 140px; margin: 0 auto 24px; }
-  .score-ring svg { transform: rotate(-90deg); }
-  .score-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 2.2rem; font-weight: 800; }
-  .score-label { font-size: 0.7rem; color: var(--muted); display: block; }
-  .result-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; }
-  .result-msg { color: var(--muted); margin-bottom: 28px; }
-  .stats-row { display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
-  .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 24px; text-align: center; }
-  .stat-box .sv { font-size: 1.6rem; font-weight: 700; }
-  .stat-box .sl { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
-  .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .action-btn { padding: 12px 28px; border-radius: 12px; border: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
-  .action-btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
-  .action-btn.secondary { background: var(--card); border: 1px solid var(--border); color: var(--text); }
-  .action-btn:hover { opacity: 0.85; }
-  .readiness-bar { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 24px; text-align: left; }
-  .rb-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
-  .rb-bar { height: 8px; background: rgba(255,255,255,0.07); border-radius: 8px; }
-  .rb-fill { height: 100%; border-radius: 8px; transition: width 1s 0.3s; }
-  .rb-title { font-weight: 600; margin-bottom: 12px; }
-
-  .flag-overlay { display: none; position: fixed; inset: 0; background: rgba(239,68,68,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
-  .flag-overlay.show { display: flex; }
-  .flag-overlay h2 { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
-  .flag-overlay p { font-size: 1.1rem; color: rgba(255,255,255,0.85); margin-bottom: 24px; }
-  .flag-overlay .dismiss { background: #fff; color: var(--danger); border: none; padding: 12px 32px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; }
-
-  .score-saving { text-align: center; font-size: 0.82rem; color: var(--accent2); margin-top: 12px; }
-  @media (max-width: 540px) {
-    .home-hero h1 { font-size: 1.9rem; }
-    .mode-cards { grid-template-columns: 1fr; }
-    .quiz-header { flex-direction: column; align-items: flex-start; }
-  }
-</style>
-</head>
-<body>
-
-<div class="flag-overlay" id="flagOverlay">
-  <div style="font-size:4rem">🚩</div>
-  <h2>TAB SWITCH DETECTED!</h2>
-  <p>-10 points penalty applied. Stay focused on your exam!</p>
-  <button class="dismiss" onclick="dismissFlag()">I Understand — Return to Exam</button>
-</div>
-
-<div class="page active" id="homePage">
-  <div class="home-hero">
-    <h1>☕ Java Exam Prep</h1>
-    <p>Master Java concepts. Pass your exam with confidence.</p>
-  </div>
-  <div class="topic-grid" id="topicGrid"></div>
-</div>
-
-<div class="page" id="modePage">
-  <div class="mode-page">
-    <div class="back-btn" onclick="goHome()">← Back</div>
-    <h2 id="modeTitle">Decision Structures</h2>
-    <p class="subtitle" id="modeSubtitle">Choose how you want to practice</p>
-    <div class="mode-cards">
-      <div class="mode-card" id="practiceCard" onclick="startMode('practice')">
-        <div class="m-icon">🎯</div>
-        <h3>Practice Mode</h3>
-        <p>20 random questions covering all aspects. Complete at least once to unlock Exam mode.</p>
-      </div>
-      <div class="mode-card" id="examCard" onclick="startMode('exam')">
-        <div class="m-icon">📝</div>
-        <h3>Exam Mode</h3>
-        <p>Full 40-question timed exam. Strict conditions. Score saved automatically.</p>
-        <div class="lock-info" id="examLockInfo"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="page" id="quizPage">
-  <div class="quiz-wrap">
-    <div class="quiz-header">
-      <div>
-        <div class="quiz-title" id="quizTopicLabel"></div>
-        <div class="q-counter" id="qCounter"></div>
-      </div>
-      <div class="quiz-meta">
-        <div id="scoreDisplay" style="font-size:0.85rem;color:var(--accent3)"></div>
-        <div class="timer-ring" id="timerRing">
-          <svg viewBox="0 0 52 52" width="52" height="52">
-            <circle class="bg" cx="26" cy="26" r="22"/>
-            <circle class="fg" id="timerCircle" cx="26" cy="26" r="22" stroke="#7c3aed" stroke-dasharray="138.23" stroke-dashoffset="0"/>
-          </svg>
-          <div class="timer-val" id="timerVal">45</div>
-        </div>
-      </div>
-    </div>
-    <div class="progress-strip"><div class="progress-strip-fill" id="qProgress"></div></div>
-    <div class="question-card" id="questionCard">
-      <span class="q-tag" id="qTag">MCQ</span>
-      <div class="q-text" id="qText"></div>
-      <div class="q-code" id="qCode" style="display:none"></div>
-      <div class="options" id="optionsArea"></div>
-      <div id="codeEditorArea" style="display:none">
-        <div class="code-editor-wrap">
-          <div class="editor-toolbar">
-            <span class="lang-badge">☕ Java</span>
-            <div class="editor-btns">
-              <button class="btn-hint" onclick="showHint()">💡 Hint</button>
-              <button class="btn-clear" onclick="clearCode()">✕ Clear</button>
-              <button class="btn-run" id="runBtn" onclick="runCode()">▶ Run & Check</button>
-            </div>
-          </div>
-          <textarea class="code-textarea" id="codeInput" placeholder="// Write your Java code here&#10;// Use System.out.print() or System.out.println() for output&#10;&#10;public class Main {&#10;    public static void main(String[] args) {&#10;        // your code&#10;    &#125;&#10;&#125;" spellcheck="false"></textarea>
-          <div class="output-panel" id="outputPanel" style="display:none">
-            <div class="output-header">
-              <span>Output</span>
-              <span class="output-status" id="outputStatus"></span>
-            </div>
-            <div class="output-body" id="outputBody"></div>
-          </div>
-        </div>
-        <div id="testCasesWrap" style="display:none"></div>
-        <div id="hintBox" style="display:none"></div>
-      </div>
-      <div class="explanation" id="explanation" style="display:none">
-        <div class="ex-head">💡 Explanation</div>
-        <p id="explainText"></p>
-      </div>
-      <button class="next-btn" id="nextBtn" style="display:none" onclick="nextQuestion()">Next Question →</button>
-    </div>
-  </div>
-</div>
-
-<div class="page" id="resultsPage">
-  <div class="results-wrap">
-    <div class="score-ring">
-      <svg viewBox="0 0 140 140" width="140" height="140">
-        <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>
-        <circle cx="70" cy="70" r="60" fill="none" id="scoreCircle" stroke-width="10" stroke-linecap="round" stroke-dasharray="376.99" stroke-dashoffset="376.99" style="transition:stroke-dashoffset 1.2s ease;"/>
-      </svg>
-      <div class="score-val"><span id="scorePercent">0</span><span class="score-label">%</span></div>
-    </div>
-    <div class="result-title" id="resultTitle">Great Job!</div>
-    <div class="result-msg" id="resultMsg"></div>
-    <div class="readiness-bar">
-      <div class="rb-title">📊 Exam Readiness</div>
-      <div id="readinessBars"></div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-box"><div class="sv" id="resCorrect" style="color:var(--success)">0</div><div class="sl">Correct</div></div>
-      <div class="stat-box"><div class="sv" id="resWrong" style="color:var(--danger)">0</div><div class="sl">Wrong</div></div>
-      <div class="stat-box"><div class="sv" id="resTime">0s</div><div class="sl">Avg Time</div></div>
-    </div>
-    <div class="score-saving" id="savingMsg"></div>
-    <div class="result-actions" style="margin-top:20px">
-      <button class="action-btn primary" onclick="retryQuiz()">🔄 Retry</button>
-      <button class="action-btn secondary" onclick="goHome()">🏠 Home</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzQ49ebOvpIuttMBXh7gkCRU857mK6T0Hr3v4yiEisPzHjwHdaPFyD744kWGVu81KymqA/exec";
-const PISTON_URL = "https://emkc.org/api/v2/piston/execute";
-
-const topics = [
-  { id: "decision", label: "Decision Structures", icon: "🔀", available: true },
-  { id: "loops", label: "Repetitive Structures", icon: "🔁", available: true },
-  { id: "arrays", label: "Arrays", icon: "📦", available: true },
-  { id: "exceptions", label: "Exceptions", icon: "⚠️", available: false },
-  { id: "files", label: "File Handling", icon: "📁", available: false },
-  { id: "oop", label: "OOP Concepts", icon: "🧬", available: false },
-];
-
-// ==================== DECISION STRUCTURES ====================
-const decisionAllQuestions = [
-  { type:"mcq", tag:"Concept", text:"Which operator represents logical AND?", options:["||","&&","!","&"], answer:1, explain:"&& is the logical AND operator. Both sides must be true for the result to be true." },
-  { type:"mcq", tag:"Concept", text:"Which operator represents logical OR?", options:["&&","||","!","=="], answer:1, explain:"|| is the logical OR operator. If either side is true, the result is true." },
-  { type:"mcq", tag:"Concept", text:"What does !false evaluate to?", options:["false","true","null","0"], answer:1, explain:"The ! (NOT) operator negates the boolean. !false = true." },
-  { type:"mcq", tag:"Concept", text:"Which is NOT a valid relational operator in Java?", options:[">","<","!=","<>"], answer:3, explain:"<> is not valid in Java. The correct 'not equal' operator is !=." },
-  { type:"mcq", tag:"Logic", text:"What is the result of (5 > 3 && 2 < 1)?", options:["true","false","error","null"], answer:1, explain:"5>3 is true but 2<1 is false. AND requires both to be true, so the result is false." },
-  { type:"mcq", tag:"Logic", text:"What is the result of (true || false)?", options:["false","true","null","error"], answer:1, explain:"OR returns true if at least one operand is true. true || false = true." },
-  { type:"mcq", tag:"Concept", text:"Which keyword is optional in an if statement?", options:["if","else","boolean","condition"], answer:1, explain:"The else block is optional. An if can exist without an else." },
-  { type:"mcq", tag:"Concept", text:"switch statements work best with?", options:["Ranges","Fixed values","Booleans","Floats"], answer:1, explain:"switch is designed for fixed, discrete values like constants or enum members." },
-  { type:"mcq", tag:"Concept", text:"Which data type is used in conditions?", options:["int","String","boolean","double"], answer:2, explain:"Conditions must evaluate to a boolean (true/false) in Java." },
-  { type:"mcq", tag:"Concept", text:"According to DeMorgan's Law, !(A || B) is equivalent to:", options:["!A || !B","!A && !B","A && B","!A && B"], answer:1, explain:"DeMorgan's Law: !(A || B) = !A && !B. Negating an OR gives AND of negations." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output of this code?", code:"int x = 10;\nif (x > 5)\n    System.out.println(\"Yes\");", options:["Yes","No","10","Nothing"], answer:0, explain:"x=10 > 5 is true, so 'Yes' is printed." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int x = 2;\nif (x > 5)\n    System.out.println(\"A\");\nelse\n    System.out.println(\"B\");", options:["A","B","AB","Error"], answer:1, explain:"x=2 is not > 5, so the else branch prints 'B'." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int x = 7;\nif (x % 2 == 0)\n    System.out.println(\"Even\");\nelse\n    System.out.println(\"Odd\");", options:["Even","Odd","7","Error"], answer:1, explain:"7 % 2 = 1, not 0. So the condition is false and 'Odd' is printed." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int x = 10;\nif (x < 5)\n    System.out.println(\"Low\");\nelse if (x < 15)\n    System.out.println(\"Medium\");\nelse\n    System.out.println(\"High\");", options:["Low","Medium","High","Error"], answer:1, explain:"x=10 is not < 5, but is < 15. So 'Medium' prints." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int x = 20;\nif (x < 10)\n    System.out.println(\"A\");\nelse if (x < 15)\n    System.out.println(\"B\");\nelse\n    System.out.println(\"C\");", options:["A","B","C","Error"], answer:2, explain:"x=20 fails both conditions, so the final else prints 'C'." },
-  { type:"trace", tag:"Output Tracing", text:"What does this code print?", code:"int x = 5;\nif (x > 3 && x < 10)\n    System.out.println(\"OK\");", options:["OK","Nothing","Error","x"], answer:0, explain:"Both 5>3 (true) AND 5<10 (true), so AND is true → prints 'OK'." },
-  { type:"trace", tag:"Switch", text:"What is the output?", code:"int x = 2;\nswitch(x){\n    case 1: System.out.println(\"One\"); break;\n    case 2: System.out.println(\"Two\"); break;\n}", options:["One","Two","OneTwo","Nothing"], answer:1, explain:"x=2 matches case 2, prints 'Two' then breaks." },
-  { type:"trace", tag:"Switch", text:"What is the output? (Fall-through!)", code:"int x = 1;\nswitch(x){\n    case 1: System.out.print(\"A\");\n    case 2: System.out.print(\"B\");\n}", options:["A","B","AB","Nothing"], answer:2, explain:"No break after case 1! It falls through to case 2 and prints 'AB'." },
-  { type:"mcq", tag:"Switch", text:"What is the purpose of the default case in a switch?", options:["Required, always runs","Runs when no case matches","Runs first","Replaces else"], answer:1, explain:"The default case executes when none of the case labels match the switch expression value." },
-  { type:"mcq", tag:"Higher Thinking", text:"Which is better for range-based conditions?", options:["switch","if-else","while","for"], answer:1, explain:"if-else handles ranges (x > 10 && x < 20) naturally. switch only works with exact values." },
-  { type:"mcq", tag:"Precedence", text:"Which logical operator has the highest precedence?", options:["||","&&","!","All equal"], answer:2, explain:"! (NOT) is a unary operator with higher precedence than && and ||." },
-  { type:"mcq", tag:"Switch Types", text:"Which type is NOT valid for a switch selector?", options:["double","int","String","Enum"], answer:0, explain:"double and other floating-point types are not valid for switch." },
-  { type:"mcq", tag:"Strings", text:"When comparing String values in an if condition, which is correct?", options:["str1 == str2","str1.equals(str2)","str1 = str2","str1.matches(str2)"], answer:1, explain:"== tests reference equality. .equals() tests content equality." },
-  { type:"mcq", tag:"Tricky", text:"In Java, what happens with: if (x = 10) where x is int?", options:["Checks equality","Compile-time error","Always executes block","Always false"], answer:1, explain:"Java requires boolean in if conditions. x=10 returns int, causing a compile-time error." },
-  { type:"mcq", tag:"DeMorgan", text:"According to DeMorgan's Law, !(A && B) equals:", options:["!A && !B","!A || !B","A || B","!A && B"], answer:1, explain:"DeMorgan's: !(A&&B) = !A || !B." },
-  { type:"mcq", tag:"Short-circuit", text:"Short-circuit evaluation occurs with which operator?", options:["&","|","||","!"], answer:2, explain:"|| short-circuits: once left operand is true, right operand is NOT evaluated." },
-  { type:"mcq", tag:"Dangling Else", text:"A 'dangling else' problem occurs when:", options:["else used without if","More else than if","else is ambiguous in nested if without braces","Default is missing in switch"], answer:2, explain:"Java associates else with the nearest preceding if without an else." },
-  { type:"trace", tag:"Dangling Else", text:"What is the output?", code:"int x = 5;\nif (x > 0)\n    if (x < 5) System.out.print(\"A\");\nelse System.out.print(\"B\");", options:["A","B","Nothing","Error"], answer:1, explain:"Dangling else: else belongs to inner if (x<5). x>0 is true, x<5 is false, so else prints 'B'." },
-  { type:"trace", tag:"Grade Ladder", text:"What is the output?", code:"int score = 85;\nif (score >= 90) System.out.print(\"A\");\nelse if (score >= 80) System.out.print(\"B\");\nelse if (score >= 70) System.out.print(\"C\");\nelse System.out.print(\"F\");", options:["A","B","C","F"], answer:1, explain:"score=85 fails >=90 but satisfies >=80. Prints 'B'." },
-  { type:"trace", tag:"Negation", text:"What is the output?", code:"int x = 5;\nif (!(x > 3 && x < 10)) System.out.print(\"1\");\nelse System.out.print(\"2\");", options:["1","2","12","Error"], answer:1, explain:"x>3&&x<10 = true. !(true) = false. Else prints '2'." },
-  { type:"trace", tag:"Switch Multi-case", text:"What is the output?", code:"int val = 5;\nswitch(val) {\n    case 1: case 3: case 5: System.out.print(\"Odd\"); break;\n    case 2: case 4: case 6: System.out.print(\"Even\"); break;\n}", options:["Odd","Even","OddEven","Nothing"], answer:0, explain:"val=5 matches case 5 (fall-through from case 1,3). Prints 'Odd'." },
-  { type:"trace", tag:"Tricky Semicolon", text:"What is the output?", code:"int x = 0;\nif (x == 0) ;\n{\n    System.out.print(\"Always\");\n}", options:["Always","Nothing","Error","x"], answer:0, explain:"Semicolon ends if with empty body. The {} block is standalone, always executes." },
-  { type:"trace", tag:"Boolean Assignment", text:"What is the output?", code:"boolean b = true;\nif (b = false) System.out.print(\"1\");\nelse System.out.print(\"2\");", options:["1","2","Error","Nothing"], answer:1, explain:"b=false is legal boolean assignment. Evaluates to false. Else runs → '2'." },
-  { type:"trace", tag:"Ternary", text:"What is the output?", code:"int x = 10, y = 20;\nSystem.out.println(x > 5 && y < 15 ? \"Yes\" : \"No\");", options:["Yes","No","Error","null"], answer:1, explain:"y<15 is false. AND fails. Ternary returns 'No'." },
-  { type:"trace", tag:"Nested if", text:"What is the output?", code:"int x = 10;\nif (x > 5)\n    if (x > 15) System.out.print(\"1\");\n    else System.out.print(\"2\");\nelse System.out.print(\"3\");", options:["1","2","3","Nothing"], answer:1, explain:"x>5 true. x>15 false. Inner else prints '2'." },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to check if x = -5 is positive or negative. Print 'Positive' or 'Negative'.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int x = -5;\n        // your code here\n    }\n}",
-    hint:"Use an if-else statement. Check if x >= 0 for Positive, otherwise Negative.",
-    testCases:[{ description:"x = -5 should print Negative", expectedOutput:"Negative" }],
-    explain:"if (x >= 0) { System.out.println(\"Positive\"); } else { System.out.println(\"Negative\"); } — x is -5 so else runs."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to check if x = 4 is Even or Odd. Print 'Even' or 'Odd'.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int x = 4;\n        // your code here\n    }\n}",
-    hint:"Use the modulo operator: x % 2 == 0 means even.",
-    testCases:[{ description:"x = 4 should print Even", expectedOutput:"Even" }],
-    explain:"x % 2 == 0 checks for even. 4 % 2 = 0, so 'Even' is printed."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to print the larger of a = 5 and b = 8. Just print the number.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int a = 5, b = 8;\n        // your code here\n    }\n}",
-    hint:"Use an if-else: if (a > b) print a, else print b.",
-    testCases:[{ description:"Max of 5 and 8 should print 8", expectedOutput:"8" }],
-    explain:"if (a > b) { System.out.println(a); } else { System.out.println(b); } — 5 is not > 8, so b=8 prints."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to check if x = 15 is between 10 and 20 (inclusive). Print 'In range' or 'Out of range'.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int x = 15;\n        // your code here\n    }\n}",
-    hint:"Use && to combine two conditions: x >= 10 && x <= 20.",
-    testCases:[{ description:"x = 15 should print 'In range'", expectedOutput:"In range" }],
-    explain:"if (x >= 10 && x <= 20) { System.out.println(\"In range\"); } — 15 satisfies both conditions."
-  },
-  {
-    type:"code", tag:"Grade Ladder",
-    text:"Write a chained if-else to print a letter grade. score = 85: A (≥90), B (≥80), C (≥70), F otherwise.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int score = 85;\n        // chained if-else here\n    }\n}",
-    hint:"Start with: if (score >= 90) ... else if (score >= 80) ... continuing down.",
-    testCases:[{ description:"score = 85 should print B", expectedOutput:"B" }],
-    explain:"if (score >= 90) { ... } else if (score >= 80) { System.out.println(\"B\"); } — 85 matches >=80."
-  },
-];
-
-// ==================== REPETITIVE STRUCTURES ====================
-const loopsAllQuestions = [
-  { type:"mcq", tag:"Concept", text:"Which loop is guaranteed to execute its body at least once?", options:["for loop","while loop","do-while loop","foreach loop"], answer:2, explain:"The do-while loop evaluates its condition at the bottom, ensuring the body runs at least once." },
-  { type:"mcq", tag:"Concept", text:"In a for(init; condition; update) loop, when is the update expression executed?", options:["Before the condition","Before the body","After the body","Only when loop terminates"], answer:2, explain:"The update occurs after each iteration of the loop body." },
-  { type:"mcq", tag:"Concept", text:"What happens when break executes inside the innermost of nested loops?", options:["All loops terminate","Only innermost loop terminates","Current iteration is skipped","Program exits"], answer:1, explain:"An unlabeled break only terminates the nearest enclosing loop." },
-  { type:"mcq", tag:"Concept", text:"Which is true about the enhanced for (foreach) loop?", options:["Can remove elements during iteration","Best for arrays and collections","Allows easy index access","Can iterate multiple arrays in parallel"], answer:1, explain:"While it simplifies code, it hides the iterator/index and is not suitable for filtering or parallel iteration." },
-  { type:"mcq", tag:"Concept", text:"What is 'short-circuit evaluation' in a loop condition?", options:["Stopping loop early with break","Skipping second part of boolean if first determines result","A hardware failure","Reducing virtual calls"], answer:1, explain:"In (x!=0 && y/x>1), if x is 0, the second part is never evaluated, preventing divide-by-zero." },
-  { type:"mcq", tag:"Concept", text:"A 'labeled break' is used to:", options:["Restart the current loop","Exit a specific named outer loop","Label output of a loop","Jump to a line outside any loop"], answer:1, explain:"By preceding a loop with an identifier and colon, a break can exit that specific loop." },
-  { type:"mcq", tag:"Concept", text:"What is the time complexity of two nested loops each iterating N times?", options:["O(N)","O(2N)","O(N²)","O(logN)"], answer:2, explain:"Nested loops used for data cross-referencing result in O(N×M) complexity." },
-  { type:"mcq", tag:"Concept", text:"How many times does 'while(false) { ... }' execute?", options:["0","1","Infinite","Compiler error"], answer:0, explain:"The condition is checked before the body; false means it never runs." },
-  { type:"mcq", tag:"Concept", text:"When using continue in a for loop, where does control transfer?", options:["To initialization","To the update expression","Out of the loop","To first line of program"], answer:1, explain:"In a for loop, continue skips to the update expression before checking the condition again." },
-  { type:"mcq", tag:"Concept", text:"Which of the following can lead to an infinite loop?", options:["Using i++ in for loop","A condition that never becomes false","A break statement","Using do-while loop"], answer:1, explain:"If the boolean expression never becomes false, the loop runs forever." },
-  { type:"mcq", tag:"Concept", text:"Which loop is best described as a 'definite loop' where iterations are known beforehand?", options:["while loop","do-while loop","for loop","if-else"], answer:2, explain:"The for loop is most commonly used to step through variables in equal increments a set number of times." },
-  { type:"mcq", tag:"Concept", text:"Why is it dangerous to use == for floating-point numbers in loop conditions?", options:["They are too large","Precision issues may prevent the condition from being exactly true","Java does not allow it","It causes memory leak"], answer:1, explain:"Rounding errors mean a calculation might never exactly equal the target value, causing infinite loops." },
-  { type:"mcq", tag:"Concept", text:"A common 'off-by-one' error occurs when:", options:["Using while instead of do-while","A loop repeats one too many or too few times","Forgetting break in switch","Using == for strings"], answer:1, explain:"This often results from carelessly designed boolean tests (e.g., using <= instead of <)." },
-  { type:"mcq", tag:"Concept", text:"Which part of for(init; condition; update) executes only once?", options:["condition","update","initialization","body"], answer:2, explain:"The initialization expression occurs only once before the first iteration begins." },
-  { type:"mcq", tag:"Concept", text:"What is the 'primary difference' between while and do-while?", options:["while can't use boolean","do-while always executes body at least once","while executes update before condition","do-while only used for counter-controlled"], answer:1, explain:"A do-while evaluates condition at the bottom, so the body runs at least once." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int i = 0;\nwhile (i < 3) {\n    System.out.print(i + \" \");\n    i++;\n}", options:["0 1 2","1 2 3","0 1 2 3","1 2"], answer:0, explain:"The loop runs while i is 0, 1, and 2. Once i becomes 3, the condition 3 < 3 is false." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"for (int i = 1; i <= 3; i++) {\n    for (int j = 1; j <= 2; j++) {\n        System.out.print((i+j) + \" \");\n    }\n}", options:["2 3 3 4 4 5","1 2 3 4 5 6","2 3 4 5 6 7","1 3 2 4 3 5"], answer:0, explain:"For each i (1-3), inner loop runs for j(1-2). Sums: (1+1,1+2),(2+1,2+2),(3+1,3+2) = 2 3 3 4 4 5." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int x = 5;\ndo {\n    System.out.print(x + \" \");\n    x--;\n} while (x > 5);", options:["5","5 4 3 2 1","Nothing","5 4"], answer:0, explain:"A do-while always executes the body once before checking. x becomes 4, and 4 > 5 is false." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"for (int i = 0; i < 5; i++) {\n    if (i == 2) continue;\n    if (i == 4) break;\n    System.out.print(i + \" \");\n}", options:["0 1 3","0 1 2 3","0 1","0 1 2 3 4"], answer:0, explain:"continue skips print for i=2. break terminates loop when i=4. Output: 0 1 3." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Tricky: Post-increment in condition)", code:"int i = 0;\nwhile (i++ < 2) {\n    System.out.print(i + \" \");\n}", options:["0 1","1 2","1 2 3","0 1 2"], answer:1, explain:"i++ < 2: checks 0<2(true), increments i to 1, prints 1. Checks 1<2(true), increments to 2, prints 2. Checks 2<2(false), exits." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Labeled continue)", code:"outer: for (int i = 1; i < 3; i++) {\n    for (int j = 1; j < 3; j++) {\n        if (i == j) continue outer;\n        System.out.print(i + \",\" + j + \" \");\n    }\n}", options:["1,2 2,1","2,1","1,2","Nothing"], answer:1, explain:"i=1,j=1: 1==1 true, continue outer goes to i=2. i=2,j=1: prints 2,1. i=2,j=2: 2==2 true, continue outer ends loop." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Array foreach)", code:"int[] arr = {10, 20, 30};\nfor (int x : arr) {\n    x = x + 5;\n}\nSystem.out.print(arr[0]);", options:["15","10","20","30"], answer:1, explain:"The enhanced for loop creates a local copy. Modifying x does NOT change the actual array. arr[0] is still 10." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Initialization)", code:"int i = 10;\nfor (i = 0; i < 2; i++) { }\nSystem.out.print(i);", options:["0","1","2","10"], answer:2, explain:"The for loop reassigns i to 0. It increments to 1, then to 2. 2<2 is false; exits with i=2." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Short-circuit AND)", code:"int a = 0, b = 0;\nif (a > 0 && b++ > 0) { }\nSystem.out.print(b);", options:["0","1","2","-1"], answer:0, explain:"a>0 is false, so b++ is never evaluated due to short-circuiting. b stays 0." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"String s = \"Java\";\nfor (int i = s.length()-1; i >= 0; i--) {\n    System.out.print(s.charAt(i));\n}", options:["Java","avaJ","Jav","aJav"], answer:1, explain:"Loop starts at index 3 ('a') and ends at index 0 ('J'), reversing the string." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Labeled Break)", code:"outer: for (int i = 0; i < 3; i++) {\n    for (int j = 0; j < 3; j++) {\n        if (i == 1) break outer;\n        System.out.print(\"X\");\n    }\n}", options:["XXX","XXXXXXXXX","XXXXXX","X"], answer:0, explain:"i=0 completes three inner iterations printing XXX. When i=1, break outer terminates entire structure." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int n = 10;\nwhile (n > 0) {\n    n /= 2;\n    System.out.print(n + \" \");\n}", options:["5 2 1 0","5 2 1","10 5 2 1","5 2 1 0 "], answer:0, explain:"Integer division: 10/2=5, 5/2=2, 2/2=1, 1/2=0. Loop stops when n=0 (not > 0)." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"for (int i = 0; i < 5; i += 2) {\n    if (i == 2) i++;\n    System.out.print(i + \" \");\n}", options:["0 3","0 2 4","0 3 5","0 2 3"], answer:0, explain:"i=0 prints. Update makes i=2. Inside body, i becomes 3 and prints. Update makes i=5, fails i<5." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int x = 1;\nwhile (x < 10) {\n    x *= 3;\n    if (x == 3) continue;\n    System.out.print(x + \" \");\n}", options:["3 9 27","9 27","3 9","27"], answer:1, explain:"x=1→3, continue skips. x=3→9, prints. x=9→27, prints. 27<10 is false." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int i = 1;\ndo {\n    i *= 2;\n} while (i < 1);\nSystem.out.print(i);", options:["1","2","0","4"], answer:1, explain:"Body runs once: i becomes 2. Condition 2<1 is false. Exits with i=2." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Side effect OR)", code:"int x = 5;\nif (x > 0 || ++x > 0) {\n    System.out.print(x);\n}", options:["5","6","0","Error"], answer:0, explain:"x>0 is true. Short-circuit || skips ++x. x stays 5." },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write a for loop that prints numbers from 1 to 5, each on a new line.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        // write your for loop here\n    }\n}",
-    hint:"for (int i = 1; i <= 5; i++) { System.out.println(i); }",
-    testCases:[{ description:"Should print 1 through 5 on separate lines", expectedOutput:"1\n2\n3\n4\n5" }],
-    explain:"A standard for loop from 1 to 5 using println prints each number on its own line."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write a while loop that prints even numbers from 2 to 10 (inclusive).",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int i = 2;\n        // your while loop here\n    }\n}",
-    hint:"while (i <= 10) { System.out.print(i + \" \"); i += 2; }",
-    testCases:[{ description:"Should print: 2 4 6 8 10", expectedOutput:"2 4 6 8 10" }],
-    explain:"Start at 2, increment by 2 each time until 10. Use while loop with i += 2."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write a do-while loop that prints numbers 1 to 3.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int i = 1;\n        // your do-while loop here\n    }\n}",
-    hint:"do { System.out.println(i); i++; } while (i <= 3);",
-    testCases:[{ description:"Should print 1, 2, 3 on separate lines", expectedOutput:"1\n2\n3" }],
-    explain:"A do-while loop prints first then checks. Runs for i=1,2,3 before 4<=3 becomes false."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write a for loop that prints the sum of numbers from 1 to 10. Print only the final sum.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int sum = 0;\n        // your loop here\n        // then print sum\n    }\n}",
-    hint:"for (int i = 1; i <= 10; i++) { sum += i; } System.out.println(sum);",
-    testCases:[{ description:"Sum of 1-10 = 55", expectedOutput:"55" }],
-    explain:"Accumulate sum in each iteration. Sum of 1+2+...+10 = 55."
-  },
-  {
-    type:"code", tag:"Nested Loops",
-    text:"Write nested for loops to print a 3x3 grid: each row on a new line, columns separated by spaces. Row 0: '0 0 0', Row 1: '1 1 1', Row 2: '2 2 2'. Print the row number for each cell.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        // nested loops here\n    }\n}",
-    hint:"Outer loop for rows (i), inner loop for columns (j). Print i in each cell.",
-    testCases:[{ description:"3x3 grid with row index", expectedOutput:"0 0 0\n1 1 1\n2 2 2" }],
-    explain:"for(int i=0;i<3;i++){ for(int j=0;j<3;j++){ System.out.print(i + (j<2?\" \":\"\")); } System.out.println(); }"
-  },
-];
-
-// ==================== ARRAYS ====================
-const arraysAllQuestions = [
-  { type:"mcq", tag:"Concept", text:"What is the worst-case time complexity of Linear Search on an array of size n?", options:["O(1)","O(log n)","O(n)","O(n²)"], answer:2, explain:"In the worst case, the search key is at the last index or not present, requiring n comparisons." },
-  { type:"mcq", tag:"Concept", text:"After the first pass of Bubble Sort, which element is guaranteed in its final position?", options:["Smallest","Largest","Middle","None"], answer:1, explain:"With each pass of Bubble Sort, the largest element 'bubbles up' to the end of the array." },
-  { type:"mcq", tag:"Concept", text:"Which searching algorithm requires the array to be sorted first?", options:["Linear Search","Sequential Search","Binary Search","All of the above"], answer:2, explain:"Binary search can only be used with a sorted array as it relies on eliminating half the range." },
-  { type:"mcq", tag:"Concept", text:"What is the time complexity of Selection Sort on an array of size n?", options:["O(n)","O(log n)","O(n²)","O(n log n)"], answer:2, explain:"Selection sort has O(n²) because it repeatedly searches for the minimum element." },
-  { type:"mcq", tag:"Concept", text:"When reversing an array in-place with two pointers, how many swaps are performed for size n?", options:["n","n/2","n-1","log n"], answer:1, explain:"Swapping continues until the two pointers meet at the center (n/2) to avoid reversing back." },
-  { type:"mcq", tag:"Concept", text:"What value is typically returned if a Linear Search fails to find the key?", options:["0","n","-1","NULL"], answer:2, explain:"If the item is not found, the algorithm returns -1 to indicate an unsuccessful search." },
-  { type:"mcq", tag:"Concept", text:"What is the best-case time complexity for an optimized Bubble Sort?", options:["O(1)","O(log n)","O(n)","O(n²)"], answer:2, explain:"An optimized Bubble Sort can finish in O(n) if the array is already sorted." },
-  { type:"mcq", tag:"Concept", text:"When logically deleting from the middle of a static array, what must happen?", options:["Elements deleted","Shift right","Shift left","Nothing"], answer:2, explain:"To overwrite the deleted element, all elements to the right must shift one position to the left." },
-  { type:"mcq", tag:"Concept", text:"Which sorting algorithm is described as 'selecting the smallest and placing it at the beginning'?", options:["Bubble Sort","Selection Sort","Insertion Sort","Quick Sort"], answer:1, explain:"Selection sort repeatedly finds the smallest element and swaps it into the correct position." },
-  { type:"mcq", tag:"Concept", text:"What is the space complexity of reversing an array in-place?", options:["O(n)","O(log n)","O(1)","O(n²)"], answer:2, explain:"In-place reversal only uses a few temporary variables regardless of array size." },
-  { type:"mcq", tag:"Concept", text:"To find the largest element in an unsorted array, how many elements must you visit?", options:["log n","n/2","n","1"], answer:2, explain:"You must traverse the entire array and compare each element to the current maximum." },
-  { type:"mcq", tag:"Concept", text:"In Selection Sort, if the array is already sorted, how many swaps are performed (efficient implementation)?", options:["n²","n","log n","0"], answer:3, explain:"An efficient selection sort only swaps if minIdx differs from the current index." },
-  { type:"mcq", tag:"Concept", text:"Which sorting algorithm uses a 'divide-and-conquer' strategy?", options:["Bubble Sort","Selection Sort","Quick Sort","Linear Sort"], answer:2, explain:"Quick Sort reduces sorting a set into sorting two smaller sets." },
-  { type:"mcq", tag:"Concept", text:"What is the status of START and END pointers in Binary Search if target is NOT found?", options:["START == END","START == -1","END < START","MID == 0"], answer:2, explain:"When the search range is exhausted without finding the key, END becomes less than START." },
-  { type:"mcq", tag:"Concept", text:"In Selection Sort for N=5, how many passes are required?", options:["5","4","1","log5"], answer:1, explain:"For N elements, Selection Sort requires N-1 passes to position all elements correctly." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {10, 20, 30, 40, 50};\nint target = 30, result = -1;\nfor (int i = 0; i < arr.length; i++) {\n    if (arr[i] == target) { result = i; break; }\n}\nSystem.out.print(result);", options:["2","3","30","-1"], answer:0, explain:"Linear search finds 30 at index 2. result = 2." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Bubble Sort pass)", code:"int[] a = {5, 3, 8, 1};\nfor (int i = 0; i < a.length-1; i++) {\n    if (a[i] > a[i+1]) {\n        int t = a[i]; a[i] = a[i+1]; a[i+1] = t;\n    }\n}\nSystem.out.print(a[a.length-1]);", options:["1","8","5","3"], answer:1, explain:"One pass of bubble sort: largest element (8) bubbles to the end. a[3] = 8." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {4, 7, 2, 7, 9, 7};\nint count = 0;\nfor (int x : arr) if (x == 7) count++;\nSystem.out.print(count);", options:["2","3","1","6"], answer:1, explain:"7 appears at indices 1, 3, and 5. count = 3." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {5, 10, 15};\nint max = arr[0];\nfor (int i = 1; i < arr.length; i++) {\n    if (arr[i] > max) max = arr[i];\n}\nSystem.out.print(max);", options:["5","10","15","0"], answer:2, explain:"Traversal compares 10 and 15 against initial max 5. max ends as 15." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Reverse)", code:"int[] arr = {3, 2, 1};\nint l=0, r=arr.length-1;\nwhile(l<r){\n    int t=arr[l]; arr[l]=arr[r]; arr[r]=t;\n    l++; r--;\n}\nSystem.out.print(arr[0]+\"\"+arr[1]+\"\"+arr[2]);", options:["321","123","312","132"], answer:1, explain:"After reversing {3,2,1}, the array becomes {1,2,3}. Output: 123." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {4, 3, 7};\nint sum = 0;\nfor (int v : arr) sum += v;\nSystem.out.print(sum/arr.length);", options:["4","14","3","5"], answer:0, explain:"Sum is 4+3+7=14. Integer division 14/3 = 4." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Selection Sort first swap)", code:"int[] a = {5, 3, 1, 4};\nint minIdx = 0;\nfor (int i = 1; i < a.length; i++) {\n    if (a[i] < a[minIdx]) minIdx = i;\n}\nint t = a[0]; a[0] = a[minIdx]; a[minIdx] = t;\nSystem.out.print(a[0]);", options:["5","3","1","4"], answer:2, explain:"Selection sort finds minimum (1) at index 2, swaps with index 0. a[0] = 1." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[][] m = {{1,2},{3,4},{5,6}};\nSystem.out.print(m[1][0]);", options:["1","2","3","4"], answer:2, explain:"m[1] is the second row {3,4}. m[1][0] is the first element of that row: 3." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Array bounds)", code:"int[] arr = {10, 20, 30};\ntry {\n    System.out.print(arr[3]);\n} catch(ArrayIndexOutOfBoundsException e) {\n    System.out.print(\"Error\");\n}", options:["10","30","0","Error"], answer:3, explain:"Accessing index 3 in a 3-element array (indices 0-2) causes ArrayIndexOutOfBoundsException." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {1,2,3,4,5};\nint sum = 0;\nfor (int i = 0; i < 3; i++) sum += arr[i];\nSystem.out.print(sum);", options:["15","6","10","1"], answer:1, explain:"Only first 3 elements (indices 0,1,2): 1+2+3 = 6." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Check sorted)", code:"int[] arr = {1,3,5,7};\nboolean sorted = true;\nfor (int i=0; i<arr.length-1; i++) {\n    if (arr[i] > arr[i+1]) { sorted=false; break; }\n}\nSystem.out.print(sorted);", options:["true","false","1","0"], answer:0, explain:"Each element is less than the next, so sorted remains true." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {2, 5, 8, 12, 16};\nint start=0, end=arr.length-1;\nwhile(start<=end) {\n    int mid=(start+end)/2;\n    if(arr[mid]==8) { System.out.print(mid); break; }\n    else if(arr[mid]<8) start=mid+1;\n    else end=mid-1;\n}", options:["1","2","3","0"], answer:1, explain:"Binary search: mid=2, arr[2]=8. Found at index 2." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Logical delete)", code:"int[] arr = {4, 8, 7, 3};\nint n = arr.length, del = 1;\nfor(int i=del; i<n-1; i++) arr[i]=arr[i+1];\nn--;\nSystem.out.print(n + \" \" + arr[0]);", options:["3 4","4 4","3 8","4 8"], answer:0, explain:"Deletes index 1 (value 8) by shifting left. n becomes 3. arr[0] is still 4." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (Frequency)", code:"int[] arr = {1,3,5,3,7,3};\nint freq = 0;\nfor (int x : arr) if (x == 3) freq++;\nSystem.out.print(freq);", options:["1","2","3","0"], answer:2, explain:"3 appears at indices 1, 3, and 5. freq = 3." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output? (2D sum)", code:"int[][] m = {{1,2},{3,4}};\nint s = 0;\nfor(int[] row : m)\n    for(int v : row) s+=v;\nSystem.out.print(s);", options:["10","6","4","12"], answer:0, explain:"1+2+3+4 = 10." },
-  { type:"trace", tag:"Output Tracing", text:"What is the output?", code:"int[] arr = {5, 3, 8, 1, 9};\nint sec = Integer.MIN_VALUE, max = Integer.MIN_VALUE;\nfor(int x : arr) {\n    if(x>max){sec=max;max=x;}\n    else if(x>sec) sec=x;\n}\nSystem.out.print(sec);", options:["9","8","5","3"], answer:1, explain:"max becomes 9, sec becomes 8 (second largest)." },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to find the maximum value in this array: int[] arr = {3, 7, 1, 9, 4}. Print the max.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int[] arr = {3, 7, 1, 9, 4};\n        int max = arr[0];\n        // your code here\n        System.out.println(max);\n    }\n}",
-    hint:"Loop from index 1. If arr[i] > max, set max = arr[i].",
-    testCases:[{ description:"Max of {3,7,1,9,4} = 9", expectedOutput:"9" }],
-    explain:"Loop through array; track maximum. 9 is the largest element."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to reverse the array {1, 2, 3, 4, 5} in-place and print all elements space-separated.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int[] arr = {1, 2, 3, 4, 5};\n        // reverse in-place here\n        for(int x : arr) System.out.print(x + \" \");\n    }\n}",
-    hint:"Use two pointers: int l=0, r=arr.length-1; while(l<r) swap arr[l] and arr[r], then l++, r--;",
-    testCases:[{ description:"Reversed {1,2,3,4,5} = 5 4 3 2 1", expectedOutput:"5 4 3 2 1 " }],
-    explain:"Two-pointer swap from ends toward center reverses the array in-place."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to perform a Linear Search for the value 7 in int[] arr = {2, 5, 7, 3, 9}. Print its index or -1 if not found.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int[] arr = {2, 5, 7, 3, 9};\n        int target = 7, result = -1;\n        // your search code here\n        System.out.println(result);\n    }\n}",
-    hint:"Loop through arr. If arr[i] == target, set result = i and break.",
-    testCases:[{ description:"7 is at index 2", expectedOutput:"2" }],
-    explain:"Linear search finds 7 at index 2. result = 2."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write one pass of Bubble Sort on int[] a = {5, 3, 8, 1}. Print the last element after the pass.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int[] a = {5, 3, 8, 1};\n        // one pass of bubble sort\n        System.out.println(a[a.length-1]);\n    }\n}",
-    hint:"for(int i=0; i<a.length-1; i++) if(a[i]>a[i+1]) { swap them }",
-    testCases:[{ description:"After one pass, largest (8) bubbles to end", expectedOutput:"8" }],
-    explain:"One Bubble Sort pass moves the largest element to the last position. 8 ends at index 3."
-  },
-  {
-    type:"code", tag:"Code Writing",
-    text:"Write Java code to count even and odd numbers in int[] arr = {1, 2, 3, 4, 5, 6}. Print 'Even:X Odd:Y'.",
-    starterCode:"public class Main {\n    public static void main(String[] args) {\n        int[] arr = {1, 2, 3, 4, 5, 6};\n        int even = 0, odd = 0;\n        // count here\n        System.out.println(\"Even:\" + even + \" Odd:\" + odd);\n    }\n}",
-    hint:"if (arr[i] % 2 == 0) even++; else odd++;",
-    testCases:[{ description:"3 evens, 3 odds", expectedOutput:"Even:3 Odd:3" }],
-    explain:"Even numbers: 2,4,6 (3 total). Odd numbers: 1,3,5 (3 total)."
-  },
-];
-
-// ==================== STATE ====================
-let currentTopic = null, currentMode = null;
-let questions = [], currentQIndex = 0, score = 0, penaltyPoints = 0;
-let timerInterval = null, timeLeft = 0, totalTime = 0;
-let questionStartTime = 0, timeSpentArr = [];
-let practiceAttemptCount = {};
-let codeAnswered = false;
-
-function loadState() {
-  try { practiceAttemptCount = JSON.parse(localStorage.getItem('javaExamAttemptCount') || '{}'); } catch(e) { practiceAttemptCount = {}; }
-}
-function saveAttemptCount() {
-  localStorage.setItem('javaExamAttemptCount', JSON.stringify(practiceAttemptCount));
-}
-
-function getQuestionBank(topicId) {
-  if (topicId === 'decision') return decisionAllQuestions;
-  if (topicId === 'loops') return loopsAllQuestions;
-  if (topicId === 'arrays') return arraysAllQuestions;
-  return [];
-}
-
-function renderHome() {
-  loadState();
-  const grid = document.getElementById('topicGrid');
-  grid.innerHTML = '';
-  topics.forEach(t => {
-    const attempts = practiceAttemptCount[t.id] || 0;
-    const examUnlocked = attempts >= 1;
-    const card = document.createElement('div');
-    card.className = 'topic-card' + (!t.available ? ' locked' : '');
-    card.onclick = t.available ? () => openTopic(t.id) : null;
-    const progressPct = examUnlocked ? 100 : 0;
-    const statusText = !t.available ? 'Pending' : 'Available';
-    const statusClass = !t.available ? 'pending' : 'available';
-    card.innerHTML = `
-      <span class="status-badge ${statusClass}">${statusText}</span>
-      <div class="icon">${t.icon}</div>
-      <h3>${t.label}</h3>
-      <div class="desc">${t.available ? 'Practice & Exam modes available' : 'Questions coming soon!'}</div>
-      ${t.available ? `
-      <div class="progress-wrap">
-        <div style="font-size:0.72rem;color:var(--muted)">Practice attempts: ${attempts} ${examUnlocked ? '— Exam Unlocked! 🔓' : '— Complete once to unlock exam 🔒'}</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
-      </div>` : ''}
-    `;
-    grid.appendChild(card);
-  });
-}
-
-function openTopic(id) {
-  loadState();
-  currentTopic = id;
-  const t = topics.find(x => x.id === id);
-  document.getElementById('modeTitle').textContent = t.label;
-  document.getElementById('modeSubtitle').textContent = 'Choose how you want to practice';
-  const attempts = practiceAttemptCount[id] || 0;
-  const examUnlocked = attempts >= 1;
-  const examCard = document.getElementById('examCard');
-  const lockInfo = document.getElementById('examLockInfo');
-  if (!examUnlocked) {
-    examCard.classList.add('disabled');
-    lockInfo.textContent = '🔒 Complete Practice at least once to unlock (any score)';
-  } else {
-    examCard.classList.remove('disabled');
-    lockInfo.textContent = '✅ Unlocked! Good luck on the exam!';
-  }
-  showPage('modePage');
-}
-
-function startMode(mode) {
-  loadState();
-  const attempts = practiceAttemptCount[currentTopic] || 0;
-  if (mode === 'exam' && attempts < 1) return;
-  currentMode = mode;
-  penaltyPoints = 0;
-  const bank = getQuestionBank(currentTopic);
-  const shuffled = [...bank].sort(() => Math.random() - 0.5);
-  if (mode === 'practice') {
-    questions = shuffled.slice(0, 20);
-  } else {
-    questions = shuffled.slice(0, 40);
-  }
-  currentQIndex = 0; score = 0; timeSpentArr = [];
-  showPage('quizPage');
-  const topicLabel = topics.find(t => t.id === currentTopic)?.label || currentTopic;
-  document.getElementById('quizTopicLabel').textContent = topicLabel + ' — ' + (mode === 'practice' ? 'Practice' : 'Exam');
-  renderQuestion();
-  startTabDetection();
-}
-
-function renderQuestion() {
-  const q = questions[currentQIndex];
-  const total = questions.length;
-  codeAnswered = false;
-  document.getElementById('qCounter').textContent = `Question ${currentQIndex + 1} of ${total}`;
-  document.getElementById('qProgress').style.width = ((currentQIndex / total) * 100) + '%';
-  document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
-  document.getElementById('qTag').textContent = q.tag;
-  document.getElementById('qText').textContent = q.text;
-  const codeEl = document.getElementById('qCode');
-  if (q.code) { codeEl.style.display = 'block'; codeEl.textContent = q.code; }
-  else codeEl.style.display = 'none';
-  document.getElementById('explanation').style.display = 'none';
-  document.getElementById('nextBtn').style.display = 'none';
-  const optArea = document.getElementById('optionsArea');
-  const codeArea = document.getElementById('codeEditorArea');
-  document.getElementById('outputPanel').style.display = 'none';
-  document.getElementById('testCasesWrap').style.display = 'none';
-  document.getElementById('hintBox').style.display = 'none';
-  document.getElementById('runBtn').disabled = false;
-
-  if (q.type === 'code') {
-    optArea.style.display = 'none';
-    codeArea.style.display = 'block';
-    document.getElementById('codeInput').value = q.starterCode || '';
-    if (q.testCases) {
-      const tcWrap = document.getElementById('testCasesWrap');
-      tcWrap.style.display = 'block';
-      tcWrap.innerHTML = '<div class="test-cases"><div class="tc-head">Test Cases</div>' +
-        q.testCases.map((tc, i) => `
-          <div class="test-case" id="tc-${i}">
-            <div class="tc-dot" id="tc-dot-${i}"></div>
-            <span class="tc-label">${tc.description}</span>
-            <span style="color:var(--muted);font-size:0.78rem">Expected: </span>
-            <span class="tc-expected">"${tc.expectedOutput}"</span>
-          </div>`).join('') + '</div>';
+This comprehensive set of 70 questions covers the core pillars of Java Object-Oriented Programming (OOP) using the provided sources. These questions are designed to be tricky and typical of examination environments.
+I. Classes and Objects (Questions 1-15)
+1. Output Tracing
+class Test {
+    int x = 10;
+    public static void main(String[] args) {
+        Test t1 = new Test();
+        Test t2 = t1;
+        t1.x = 20;
+        System.out.println(t2.x);
     }
-  } else {
-    codeArea.style.display = 'none';
-    optArea.style.display = 'grid';
-    optArea.innerHTML = '';
-    const labels = ['A','B','C','D'];
-    q.options.forEach((opt, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'option-btn';
-      btn.innerHTML = `<span class="opt-label">${labels[i]}</span><span>${opt}</span>`;
-      btn.onclick = () => selectOption(i, btn);
-      optArea.appendChild(btn);
-    });
-  }
-  // Code questions get 5 minutes (300s), others get 45s
-  const timeForQ = q.type === 'code' ? 300 : 45;
-  startTimer(timeForQ);
-  questionStartTime = Date.now();
 }
-
-function selectOption(index, btn) {
-  const q = questions[currentQIndex];
-  clearInterval(timerInterval);
-  const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
-  timeSpentArr.push(timeSpent);
-  const allBtns = document.querySelectorAll('.option-btn');
-  allBtns.forEach(b => b.disabled = true);
-  const correct = index === q.answer;
-  if (correct) { btn.classList.add('correct'); score++; }
-  else { btn.classList.add('wrong'); allBtns[q.answer].classList.add('correct'); }
-  document.getElementById('explainText').textContent = q.explain;
-  document.getElementById('explanation').style.display = 'block';
-  document.getElementById('nextBtn').style.display = 'block';
-  document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+Answer: 20
+Explanation: In Java, assigning one object variable to another (t2 = t1) copies the reference, not the object itself. Both variables point to the same instance in memory
+.
+2. MCQ: Which keyword is used to allocate memory for a new object? A. malloc B. create C. new D. this
+Answer: C
+Explanation: The new operator is used to invoke a constructor and allocate memory for a new instance of a class
+.
+3. Output Tracing
+class Family {
+    static String surname = "Smith";
+    String name;
 }
-
-function showHint() {
-  const q = questions[currentQIndex];
-  if (!q.hint) return;
-  const hb = document.getElementById('hintBox');
-  hb.style.display = 'block';
-  hb.innerHTML = `<div class="hint-box"><strong>💡 Hint</strong>${q.hint}</div>`;
+// In Main:
+Family f1 = new Family();
+Family f2 = new Family();
+f1.surname = "Jones";
+System.out.println(f2.surname);
+Answer: Jones
+Explanation: Class variables (marked static) have only one copy shared by all instances. Changing it through one object affects all others
+.
+4. MCQ: Which of the following is true about primitive types vs. objects? A. Primitives are stored as references. B. Primitives are not objects for the sake of efficiency. C. You can call methods on an int variable. D. String is a primitive type.
+Answer: B
+Explanation: Primitive types like int and char directly map to machine representation and instructions for efficiency; they are not objects
+.
+5. Short Code: Write a line of code to determine the class name of an object obj.
+Answer: obj.getClass().getName();
+Explanation: The getClass() method returns a Class object, and getName() retrieves the string representation of the class name
+.
+6. Output Tracing
+String s1 = "Java";
+String s2 = new String("Java");
+System.out.println(s1 == s2);
+System.out.println(s1.equals(s2));
+Answer: false, true
+Explanation: The == operator checks if references point to the same object. new String() creates a distinct object. The equals() method checks the actual character sequence
+.
+7. MCQ: What happens if you try to use a primitive type where an object is expected in Java 1.5+? A. Compilation error B. It is automatically converted via autoboxing. C. It results in a NullPointerException. D. The program crashes at runtime.
+Answer: B
+Explanation: Autoboxing automatically converts primitive types to their corresponding object wrappers when needed
+.
+8. Short Code: Define a class Point with two private instance variables x and y.
+public class Point {
+    private int x;
+    private int y;
 }
-
-function clearCode() {
-  const q = questions[currentQIndex];
-  document.getElementById('codeInput').value = q.starterCode || '';
-  document.getElementById('outputPanel').style.display = 'none';
+Explanation: Instance variables specify the set of values for an object and should generally be marked private for encapsulation
+.
+9. Output Tracing
+class MathUtils {
+    static int add(int a, int b) { return a + b; }
 }
+// In Main:
+MathUtils mu = null;
+System.out.println(mu.add(5, 5));
+Answer: 10
+Explanation: Static methods belong to the class, not the instance. They can be called using a null reference without throwing a NullPointerException
+.
+10. MCQ: Which of these is a reference type? A. boolean B. double C. int[] (Array) D. char
+Answer: C
+Explanation: In Java, arrays are reference types, along with Strings and user-defined classes
+.
+11. Short Code: How do you declare a constant instance variable that cannot be changed after initialization?
+Answer: Use the final keyword (e.g., private final int id;)
+.
+12. Output Tracing
+int x = 5;
+int y = x;
+x = 10;
+System.out.println(y);
+Answer: 5
+Explanation: For primitive types, the value is copied. Changing the original variable does not affect the copy
+.
+13. MCQ: What does the dot operator (.) do? A. Creates a new object. B. Invokes a method or accesses a variable on an object. C. Compares two objects. D. Deletes an object.
+Answer: B
+Explanation: Dot notation is used to refer to an object's instance variables and methods
+.
+14. Short Code: Write a statement using instanceof to check if myObj is a String.
+Answer: if (myObj instanceof String)
+.
+15. Output Tracing
+String s = "Hello";
+s.toUpperCase();
+System.out.println(s);
+Answer: Hello
+Explanation: Strings are immutable. toUpperCase() returns a new string; it does not modify the original instance
+.
 
-async function runCode() {
-  if (codeAnswered) return;
-  const q = questions[currentQIndex];
-  const userCode = document.getElementById('codeInput').value.trim();
-  if (!userCode) return;
-
-  const runBtn = document.getElementById('runBtn');
-  runBtn.disabled = true;
-  runBtn.textContent = '⏳ Running...';
-
-  let codeToRun = userCode;
-  if (!userCode.includes('class Main') && !userCode.includes('public class')) {
-    codeToRun = `public class Main {\n    public static void main(String[] args) {\n${userCode.split('\n').map(l => '        ' + l).join('\n')}\n    }\n}`;
-  }
-
-  const outputPanel = document.getElementById('outputPanel');
-  const outputStatus = document.getElementById('outputStatus');
-  const outputBody = document.getElementById('outputBody');
-  outputPanel.style.display = 'block';
-  outputStatus.textContent = 'Running...';
-  outputStatus.className = 'output-status status-running';
-  outputBody.textContent = 'Compiling and running Java code...';
-  outputBody.className = 'output-body out-running';
-
-  try {
-    const res = await fetch(PISTON_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        language: 'java',
-        version: '15.0.2',
-        files: [{ name: 'Main.java', content: codeToRun }]
-      })
-    });
-    const data = await res.json();
-    const stdout = (data.run?.stdout || '').trim();
-    const stderr = (data.run?.stderr || data.compile?.stderr || '').trim();
-
-    if (stderr && !stdout) {
-      outputStatus.textContent = 'Compile Error';
-      outputStatus.className = 'output-status status-error';
-      outputBody.textContent = stderr;
-      outputBody.className = 'output-body out-error';
-      runBtn.disabled = false;
-      runBtn.textContent = '▶ Run & Check';
-      return;
+--------------------------------------------------------------------------------
+II. Constructors (Questions 16-30)
+16. Output Tracing
+class A {
+    A() { System.out.print("1"); }
+}
+class B extends A {
+    B() { System.out.print("2"); }
+}
+// In Main: 
+new B();
+Answer: 12
+Explanation: When a subclass object is created, the parent class constructor is automatically invoked first to initialize inherited properties
+.
+17. MCQ: If no constructor is defined in a class, what does Java provide? A. Nothing; the code won't compile. B. A default constructor with no parameters. C. A constructor that requires all instance variables as arguments. D. A private constructor.
+Answer: B
+Explanation: Java automatically provides a default no-argument constructor if the programmer defines none
+.
+18. Short Code: Write a constructor for class Book that initializes a private String title.
+public Book(String title) {
+    this.title = title;
+}
+Explanation: The this keyword distinguishes the instance variable from the parameter when they share the same name
+.
+19. Output Tracing
+class MyClass {
+    int x;
+    MyClass(int val) { x = val; }
+}
+// In Main:
+MyClass m = new MyClass();
+Answer: Compilation Error
+Explanation: If you define any constructor, Java no longer provides the automatic default no-argument constructor
+.
+20. MCQ: What is the return type of a constructor? A. void B. The class type itself. C. None. D. Object
+Answer: C
+Explanation: Constructors have no return type, not even void. Specifying one turns it into a regular method
+.
+21. Short Code: Write a "Copy Constructor" for a class Point(int x, int y).
+public Point(Point other) {
+    this.x = other.x;
+    this.y = other.y;
+}
+Explanation: A copy constructor creates a new object by copying attributes from an existing instance of the same class
+.
+22. Output Tracing
+class Box {
+    Box() { this(10); System.out.print("A"); }
+    Box(int x) { System.out.print("B"); }
+}
+// In Main:
+new Box();
+Answer: BA
+Explanation: this(10) invokes the parameterized constructor first. Control then returns to finish the no-arg constructor
+.
+23. MCQ: Can a constructor be private? A. No, it must be public to create objects. B. Yes, to restrict instantiation (e.g., Singleton pattern). C. Yes, but only in abstract classes. D. No, it causes a compiler error.
+Answer: B
+Explanation: Private constructors are used to control object creation, often in utility classes or Singletons
+.
+24. Short Code: How do you call a superclass constructor that takes an integer id?
+Answer: super(id);
+.
+25. Output Tracing
+class Alpha {
+    Alpha() { System.out.print("Alpha"); }
+}
+class Beta extends Alpha {
+    Beta() { 
+        super();
+        System.out.print("Beta"); 
     }
+}
+// In Main:
+new Beta();
+Answer: AlphaBeta
+Explanation: super() must be the first statement in a constructor. It explicitly calls the parent constructor
+.
+26. MCQ: What is "Constructor Overloading"? A. Having multiple constructors with the same parameter list. B. Having multiple constructors with different parameter lists in one class. C. Inheriting a constructor from a parent class. D. Overriding a parent constructor in a subclass.
+Answer: B
+Explanation: Overloading allows different ways to initialize an object by varying the number or type of arguments
+.
+27. Short Code: Correct the error in this constructor.
+class Dog {
+    void Dog() { System.out.print("Bark"); } 
+}
+Answer: Remove void.
+Explanation: Adding a return type like void makes it a method, not a constructor
+.
+28. Output Tracing
+class Test {
+    Test() { System.out.println("Created"); }
+}
+Test t;
+Answer: (No output)
+Explanation: Declaring a variable does not invoke the constructor. The constructor only runs when new is used
+.
+29. MCQ: Which of the following cannot be used in a constructor? A. this() B. super() C. return 5; D. System.out.println()
+Answer: C
+Explanation: Since constructors have no return type, they cannot return a value
+.
+30. Short Code: What is the first (implicit or explicit) line of every constructor?
+Answer: A call to super() or this()
+.
 
-    outputBody.textContent = stdout || '(no output)';
-
-    let allPass = true;
-    if (q.testCases) {
-      q.testCases.forEach((tc, i) => {
-        const dot = document.getElementById('tc-dot-' + i);
-        const tcEl = document.getElementById('tc-' + i);
-        const actual = stdout.trim();
-        const expected = tc.expectedOutput.trim();
-        const pass = actual === expected;
-        if (!pass) allPass = false;
-        dot.className = 'tc-dot ' + (pass ? 'pass' : 'fail');
-        const existing = tcEl.querySelector('.tc-got');
-        if (existing) existing.remove();
-        if (!pass) {
-          tcEl.innerHTML += `<span style="color:var(--muted);font-size:0.78rem">Got: </span><span class="tc-got">"${actual}"</span>`;
-        }
-      });
+--------------------------------------------------------------------------------
+III. Inheritance (Questions 31-45)
+31. Output Tracing
+class Parent {
+    void greet() { System.out.print("Hi "); }
+}
+class Child extends Parent {
+    void greet() { 
+        super.greet();
+        System.out.print("Hello"); 
     }
-
-    if (allPass) {
-      outputStatus.textContent = '✓ All tests passed';
-      outputStatus.className = 'output-status status-pass';
-      outputBody.className = 'output-body out-pass';
-      score++;
-      document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
-      codeAnswered = true;
-      clearInterval(timerInterval);
-      const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
-      timeSpentArr.push(timeSpent);
-      document.getElementById('explainText').textContent = '✅ Correct! ' + q.explain;
-      document.getElementById('explanation').style.display = 'block';
-      document.getElementById('nextBtn').style.display = 'block';
-      runBtn.textContent = '✓ Passed';
-    } else {
-      outputStatus.textContent = '✗ Test failed — try again';
-      outputStatus.className = 'output-status status-fail';
-      outputBody.className = 'output-body out-fail';
-      runBtn.disabled = false;
-      runBtn.textContent = '▶ Run & Check';
-    }
-  } catch(e) {
-    outputStatus.textContent = 'Network Error';
-    outputStatus.className = 'output-status status-error';
-    outputBody.textContent = 'Could not connect to code runner. Check your internet connection.\n\nError: ' + e.message;
-    outputBody.className = 'output-body out-error';
-    runBtn.disabled = false;
-    runBtn.textContent = '▶ Run & Check';
-  }
 }
-
-document.getElementById('codeInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const start = this.selectionStart;
-    const end = this.selectionEnd;
-    this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-    this.selectionStart = this.selectionEnd = start + 4;
-  }
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-    runCode();
-  }
-});
-
-function nextQuestion() {
-  if (!codeAnswered) {
-    const q = questions[currentQIndex];
-    if (q.type === 'code') {
-      const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
-      timeSpentArr.push(timeSpent);
-    }
-  }
-  currentQIndex++;
-  if (currentQIndex >= questions.length) { endQuiz(); return; }
-  renderQuestion();
+// In Main:
+new Child().greet();
+Answer: Hi Hello
+Explanation: super.memberName is used to invoke the version of the method defined in the immediate parent class
+.
+32. MCQ: Which keyword is used to implement inheritance in Java? A. implements B. inherits C. extends D. super
+Answer: C
+Explanation: The extends keyword establishes a parent-child relationship between classes
+.
+33. Output Tracing
+class P { int x = 5; }
+class C extends P { int x = 10; }
+// In Main:
+P obj = new C();
+System.out.println(obj.x);
+Answer: 5
+Explanation: Variable shadowing occurs in inheritance. Unlike methods, variables are not polymorphic; the reference type determines which variable is accessed
+.
+34. MCQ: Can a Java class extend multiple classes? A. Yes, using commas. B. No, Java only supports single inheritance for classes. C. Only if the classes are abstract. D. Yes, if they are in the same package.
+Answer: B
+Explanation: Java supports single inheritance to keep the hierarchy simple and avoid conflicts
+.
+35. Short Code: Use the super keyword to access a parent's variable speed when the child also has a variable named speed.
+Answer: super.speed;
+.
+36. Output Tracing
+class Base {
+    final void msg() { System.out.print("Base"); }
 }
-
-function startTimer(seconds) {
-  clearInterval(timerInterval);
-  timeLeft = seconds; totalTime = seconds;
-  updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerDisplay();
-    if (timeLeft <= 0) { clearInterval(timerInterval); autoSkip(); }
-  }, 1000);
+class Derived extends Base {
+    // void msg() { System.out.print("Derived"); } 
 }
-
-function updateTimerDisplay() {
-  const el = document.getElementById('timerVal');
-  const circle = document.getElementById('timerCircle');
-  // Show mm:ss for code questions (300s)
-  if (totalTime >= 60) {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-    el.style.fontSize = '0.65rem';
-  } else {
-    el.textContent = timeLeft;
-    el.style.fontSize = '0.8rem';
-  }
-  const circumference = 138.23;
-  const offset = circumference * (1 - timeLeft / totalTime);
-  circle.style.strokeDashoffset = offset;
-  const pct = timeLeft / totalTime;
-  if (pct > 0.5) circle.style.stroke = '#7c3aed';
-  else if (pct > 0.25) circle.style.stroke = '#f59e0b';
-  else circle.style.stroke = '#ef4444';
-  el.style.color = pct <= 0.25 ? 'var(--danger)' : 'var(--text)';
+Answer: Compilation Error (if uncommented).
+Explanation: Subclasses cannot override methods marked as final
+.
+37. MCQ: Which members are NOT inherited by a subclass? A. Public methods B. Protected variables C. Private variables and constructors D. Package-private members in the same package
+Answer: C
+Explanation: Constructors are not inherited, and private members are hidden from subclasses
+.
+38. Output Tracing
+class Animal {
+    Animal() { System.out.print("A"); }
 }
-
-function autoSkip() {
-  const q = questions[currentQIndex];
-  timeSpentArr.push(totalTime);
-  if (q.type !== 'code') {
-    const allBtns = document.querySelectorAll('.option-btn');
-    if (allBtns.length) {
-      allBtns.forEach(b => b.disabled = true);
-      allBtns[q.answer].classList.add('correct');
-    }
-  } else {
-    document.getElementById('runBtn').disabled = true;
-  }
-  document.getElementById('explainText').textContent = '⏱ Time up! ' + q.explain;
-  document.getElementById('explanation').style.display = 'block';
-  document.getElementById('nextBtn').style.display = 'block';
+class Dog extends Animal {
+    Dog(String name) { System.out.print("D"); }
 }
-
-function endQuiz() {
-  clearInterval(timerInterval);
-  stopTabDetection();
-  const total = questions.length;
-  const finalScore = Math.max(0, score - penaltyPoints);
-  const pct = Math.round((finalScore / total) * 100);
-  const avgTime = timeSpentArr.length ? Math.round(timeSpentArr.reduce((a,b)=>a+b,0)/timeSpentArr.length) : 0;
-
-  // Mark practice as attempted (any score unlocks exam)
-  if (currentMode === 'practice') {
-    practiceAttemptCount[currentTopic] = (practiceAttemptCount[currentTopic] || 0) + 1;
-    saveAttemptCount();
-  }
-
-  showPage('resultsPage');
-  setTimeout(() => {
-    const scoreCircle = document.getElementById('scoreCircle');
-    const circumference = 376.99;
-    const offset = circumference * (1 - pct / 100);
-    scoreCircle.style.strokeDashoffset = offset;
-    scoreCircle.style.stroke = pct >= 85 ? '#22c55e' : pct >= 60 ? '#f59e0b' : '#ef4444';
-  }, 100);
-  document.getElementById('scorePercent').textContent = pct;
-  document.getElementById('resCorrect').textContent = finalScore;
-  document.getElementById('resWrong').textContent = total - score;
-  document.getElementById('resTime').textContent = avgTime + 's';
-  const msgs = {
-    pass: ["🎉 Excellent! You're exam ready!", "🌟 Outstanding performance!", "💪 You crushed it!"],
-    ok: ["📚 Good effort! Review weak areas.", "🔍 Almost there, keep practicing.", "💡 You're getting there!"],
-    fail: ["😅 Keep going! Practice more.", "🔄 Review the topics and try again.", "📖 More practice needed."]
-  };
-  const bucket = pct >= 85 ? 'pass' : pct >= 60 ? 'ok' : 'fail';
-  document.getElementById('resultTitle').textContent = msgs[bucket][Math.floor(Math.random() * 3)];
-
-  const attempts = practiceAttemptCount[currentTopic] || 0;
-  let resultMsg = '';
-  if (currentMode === 'practice') {
-    resultMsg = pct >= 85
-      ? `You scored ${pct}%! Great work. Exam mode is now unlocked.`
-      : `You scored ${pct}%. Exam mode is now unlocked — you can attempt it anytime!`;
-  } else {
-    resultMsg = `You scored ${pct}% on the full exam. ${pct >= 85 ? 'Outstanding!' : 'Keep practicing to improve!'}`;
-  }
-  if (penaltyPoints > 0) resultMsg += ` (${penaltyPoints} pts deducted for tab switching)`;
-  document.getElementById('resultMsg').textContent = resultMsg;
-
-  const rb = document.getElementById('readinessBars');
-  rb.innerHTML = '';
-  const sections = [
-    { name: 'MCQ Concepts', score: pct > 70 ? pct : Math.max(40, pct - 15) },
-    { name: 'Output Tracing', score: pct > 60 ? pct - 5 : Math.max(35, pct - 20) },
-    { name: 'Code Writing', score: pct > 80 ? pct - 10 : Math.max(30, pct - 30) },
-    { name: 'Core Logic', score: pct > 65 ? pct + 5 : Math.max(35, pct) }
-  ];
-  sections.forEach(s => {
-    const clr = s.score >= 85 ? '#22c55e' : s.score >= 60 ? '#f59e0b' : '#ef4444';
-    rb.innerHTML += `
-      <div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px">
-          <span>${s.name}</span><span style="color:${clr}">${Math.min(100, s.score)}%</span>
-        </div>
-        <div class="rb-bar"><div class="rb-fill" style="width:${Math.min(100,s.score)}%;background:${clr}"></div></div>
-      </div>`;
-  });
-
-  saveToSheets(pct, finalScore, total, currentMode, currentTopic);
+// In Main:
+new Dog("Buddy");
+Answer: AD
+Explanation: Even if the child constructor is parameterized, it still implicitly calls the parent's no-arg constructor first
+.
+39. Short Code: Write the class header for Car inheriting from Vehicle.
+Answer: class Car extends Vehicle { ... }
+.
+40. MCQ: What is the "immediate superclass" of every class in Java that doesn't explicitly extend another? A. Main B. System C. Object D. Class
+Answer: C
+Explanation: The Object class is the root of the entire Java class hierarchy
+.
+41. Output Tracing
+class Top { void doIt() { System.out.print("T"); } }
+class Mid extends Top { void doIt() { System.out.print("M"); } }
+class Bot extends Mid { 
+    void test() { super.doIt(); } 
 }
+// In Main:
+new Bot().test();
+Answer: M
+Explanation: super only accesses the immediate superclass. Bot's super is Mid, not Top
+.
+42. MCQ: What is method overriding? A. Defining two methods with the same name but different parameters in the same class. B. A subclass providing a specific implementation for a method already defined in its superclass. C. Calling a method from a different class. D. Hiding a static method.
+Answer: B
+Explanation: Overriding allows runtime polymorphism where the specific subclass version of a method is executed
+.
+43. Short Code: Prevent a class from being inherited.
+Answer: Use the final keyword in the class definition (e.g., final class Private { })
+.
+44. Output Tracing
+class Super { static void staticShow() { System.out.print("S"); } }
+class Sub extends Super { static void staticShow() { System.out.print("s"); } }
+// In Main:
+Super obj = new Sub();
+obj.staticShow();
+Answer: S
+Explanation: Static methods are not polymorphic; they are hidden, not overridden. The method called is based on the reference type, not the object type
+.
+45. MCQ: What happens if a parent class does not have a no-argument constructor and the child does not explicitly call super(args)? A. Compilation error in the child class. B. The child class uses default values. C. The parent class variables are ignored. D. The program runs normally.
+Answer: A
+Explanation: Java tries to call super() by default. If it doesn't exist, you must explicitly call a valid parent constructor
+.
 
-function saveToSheets(pct, scoreVal, total, mode, topic) {
-  const msg = document.getElementById('savingMsg');
-  msg.textContent = '📡 Saving score...';
-  const params = new URLSearchParams({
-    score: pct,
-    correct: scoreVal,
-    total: total,
-    mode: mode,
-    topic: topic,
-    penalty: penaltyPoints,
-    timestamp: new Date().toISOString()
-  });
-  const url = SHEETS_URL + '?' + params.toString();
-  // Use no-cors to avoid CORS errors with Google Apps Script
-  fetch(url, { method: 'GET', mode: 'no-cors' })
-    .then(() => { msg.textContent = '✅ Score saved to Google Sheet!'; })
-    .catch(() => { msg.textContent = '⚠️ Could not save score. Check connection.'; });
+--------------------------------------------------------------------------------
+IV. Polymorphism (Questions 46-60)
+46. Output Tracing
+class Shape { void draw() { System.out.print("S"); } }
+class Circle extends Shape { void draw() { System.out.print("C"); } }
+// In Main:
+Shape s = new Circle();
+s.draw();
+Answer: C
+Explanation: This is runtime polymorphism. Java determines which method to invoke based on the actual object type (Circle), not the reference type (Shape)
+.
+47. MCQ: Which of these is an example of "Compile-time Polymorphism"? A. Method Overriding B. Method Overloading C. Inheritance D. Encapsulation
+Answer: B
+Explanation: Overloading is resolved at compile time based on method signatures
+.
+48. Output Tracing
+class Calculator {
+    int add(int a, int b) { return a + b; }
+    double add(double a, double b) { return a + b; }
 }
+// In Main:
+System.out.println(new Calculator().add(5, 5.0));
+Answer: 10.0
+Explanation: The compiler selects the double version because one argument is a double, illustrating method overloading
+.
+49. MCQ: What is "Dynamic Method Dispatch"? A. Calling a static method. B. The process where a call to an overridden method is resolved at runtime. C. Casting an object to a superclass. D. Accessing a private variable.
+Answer: B
+Explanation: It is the mechanism by which the JVM selects the correct method implementation for a polymorphic call at execution time
+.
+50. Short Code: Perform an explicit "Downcast" of Shape s to Circle c.
+Answer: Circle c = (Circle) s;
+.
+51. Output Tracing
+class Bird { void fly() { System.out.print("F"); } }
+class Penguin extends Bird { void fly() { System.out.print("f"); } }
+// In Main:
+Bird b = new Bird();
+Penguin p = (Penguin) b;
+Answer: Runtime Exception (ClassCastException)
+Explanation: You cannot cast a parent instance to a child type if the actual object is not an instance of that child type
+.
+52. MCQ: Which of the following is NOT true about polymorphism? A. It enhances code reusability. B. It allows objects of different subclasses to be treated uniformly. C. It only works with private methods. D. Interfaces are commonly used to achieve it.
+Answer: C
+Explanation: Private methods cannot be overridden and thus do not participate in runtime polymorphism
+.
+53. Short Code: Define an abstract method move() in class Vehicle.
+Answer: abstract void move();
+.
+54. Output Tracing
+abstract class Pet { abstract void speak(); }
+class Cat extends Pet { void speak() { System.out.print("Meow"); } }
+// In Main:
+// Pet p = new Pet();
+Answer: Compilation Error
+Explanation: Abstract classes cannot be instantiated directly
+.
+55. MCQ: What does "polymorphism" literally mean? A. Data hiding B. Single inheritance C. Many shapes D. Code reuse
+Answer: C
+Explanation: The term reflects how a single interface/action can behave differently for different data types
+.
+56. Output Tracing
+interface Drawable { void draw(); }
+class Pen implements Drawable { public void draw() { System.out.print("P"); } }
+// In Main:
+Drawable d = new Pen();
+d.draw();
+Answer: P
+Explanation: Interfaces allow polymorphic behavior; the reference d can point to any class that implements Drawable
+.
+57. Short Code: Use an anonymous object to call method show() in class Display.
+Answer: new Display().show();
+.
+58. MCQ: Can you override a static method? A. Yes, always. B. No, static methods are hidden, not overridden. C. Only if the parent class is abstract. D. Yes, but you must use the @Override annotation.
+Answer: B
+Explanation: Static methods are bound at compile time based on class, not instance
+.
+59. Output Tracing
+class Parent { void test() { System.out.print("1"); } }
+class Child extends Parent { void test() { System.out.print("2"); } }
+// In Main:
+Parent p = new Child();
+((Parent)p).test();
+Answer: 2
+Explanation: Even with a cast back to the parent type, the actual object is still a Child, so the overridden method is called
+.
+60. Short Code: Write a method makeSound(Animal a) that demonstrates polymorphism.
+Answer: void makeSound(Animal a) { a.sound(); }
+Explanation: This method can accept any subclass of Animal and will invoke the correct specific sound() implementation
+.
 
-function retryQuiz() { startMode(currentMode); }
-function goHome() { clearInterval(timerInterval); stopTabDetection(); showPage('homePage'); renderHome(); }
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+--------------------------------------------------------------------------------
+V. Encapsulation (Questions 61-70)
+61. MCQ: What is the main purpose of encapsulation? A. To allow multiple inheritance. B. To bundle data and methods and protect them from external interference. C. To make programs run faster. D. To use the new keyword.
+Answer: B
+Explanation: Encapsulation binding data with code that manipulates it, keeping it safe from outside access
+.
+62. Output Tracing
+class Account {
+    private int balance = 100;
 }
-
-let tabDetectionOn = false;
-function startTabDetection() {
-  tabDetectionOn = true;
-  document.addEventListener('visibilitychange', handleVisibility);
-  window.addEventListener('blur', handleBlur);
+// In Main:
+Account a = new Account();
+// System.out.println(a.balance);
+Answer: Compilation Error
+Explanation: Private variables cannot be accessed directly from outside the class
+.
+63. Short Code: Write a "Getter" method for a private integer age.
+Answer: public int getAge() { return age; }
+.
+64. MCQ: Which access modifier offers the most restriction? A. public B. protected C. private D. (Default/Package-private)
+Answer: C
+Explanation: private limits access strictly to within the same class
+.
+65. Short Code: Write a "Setter" method for age that only sets the value if it is positive.
+public void setAge(int age) {
+    if (age > 0) this.age = age;
 }
-function stopTabDetection() {
-  tabDetectionOn = false;
-  document.removeEventListener('visibilitychange', handleVisibility);
-  window.removeEventListener('blur', handleBlur);
+Explanation: Setters allow data validation before modifying the internal state
+.
+66. MCQ: Encapsulation is often referred to as...? A. Open-source programming B. Data hiding C. Method overloading D. Global access
+Answer: B
+Explanation: It hides the internal state of an object by requiring interaction through public methods
+.
+67. Output Tracing
+class Secret {
+    private String data;
+    public void setData(String d) { data = d; }
+    public String getData() { return data; }
 }
-function handleVisibility() { if (document.hidden && tabDetectionOn) triggerFlag(); }
-function handleBlur() { if (tabDetectionOn) triggerFlag(); }
-function triggerFlag() {
-  penaltyPoints += 10;
-  document.getElementById('flagOverlay').classList.add('show');
-}
-function dismissFlag() { document.getElementById('flagOverlay').classList.remove('show'); }
-
-renderHome();
-</script>
-</body>
-</html>
+// In Main:
+Secret s = new Secret();
+s.setData("Top Secret");
+System.out.println(s.getData());
+Answer: Top Secret
+Explanation: This demonstrates standard encapsulated access via getters and setters
+.
+68. Short Code: How do you make a class "Immutable"?
+Answer: Use private final fields and provide no setter methods
+.
+69. MCQ: Which modifier allows access to subclasses in different packages? A. private B. protected C. (Default) D. static
+Answer: B
+Explanation: protected allows access within the same package and by subclasses even if they are in different packages
+.
+70. MCQ: What is a "Black Box" in the context of encapsulation? A. A computer with a broken screen. B. A class where the implementation is hidden and you only interact with the API. C. A method that has no code inside. D. A private constructor.
+Answer: B
+Explanation: Users of the class don't need to know how it works internally to use its functionality
